@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>🪙 МОНЕТКА — KINGWIN</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Georgia,serif}
+body{background: radial-gradient(ellipse at 50% 0%, #5a0f0f 0%, #2a0808 40%, #150505 70%, #0a0202 100%); color:#fff;min-height:100vh;padding:10px;display:flex;justify-content:center;align-items:flex-start}
+.c{width:100%;max-width:600px;margin:0 auto}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:8px;flex-wrap:wrap}
+.back{padding:7px 14px;border-radius:10px;background:linear-gradient(180deg,#2a0808,#1a0505);border:2px solid #d4af37;color:#ffd700;text-decoration:none;font-size:.75em;font-weight:700;letter-spacing:1px}
+.back:hover{transform:translateX(-3px);box-shadow:0 0 18px rgba(212,175,55,.7)}
+.bal-box{display:flex;align-items:center;gap:8px;padding:9px 16px;background:linear-gradient(180deg,#2a0808,#1a0505);border:3px solid #d4af37;border-radius:12px;box-shadow:0 0 0 1px #8a6a10 inset,0 0 22px rgba(212,175,55,.5);min-width:160px}
+.bal-box .lbl{font-size:.5em;font-weight:700;letter-spacing:2px;color:#d4af37;margin-bottom:2px;text-transform:uppercase}
+.bal-box .num{font-size:1em;font-weight:700;background:linear-gradient(180deg,#fff8d0,#ffd700 50%,#b8860b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-variant-numeric:tabular-nums}
+h1{text-align:center;font-size:1.5em;font-weight:800;letter-spacing:7px;background:linear-gradient(180deg,#fff8d0,#ffd700 40%,#b8860b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:2px}
+.subtitle{text-align:center;color:#d4af37;font-size:.55em;letter-spacing:4px;margin-bottom:10px;text-transform:uppercase;opacity:.85}
+.panel{background:linear-gradient(180deg,rgba(42,8,8,.95),rgba(10,2,2,.98));border:2px solid #d4af37;border-radius:16px;padding:20px;box-shadow:0 0 30px rgba(212,175,55,.3);text-align:center;position:relative;}
+.dev-badge{display:inline-block;padding:6px 16px;border-radius:20px;background:linear-gradient(180deg,#ff6b6b,#a93226);color:#fff;font-size:.65em;font-weight:900;letter-spacing:3px;text-transform:uppercase;box-shadow:0 0 20px rgba(255,107,107,.7);margin-bottom:16px;animation:devPulse 2s infinite;}
+@keyframes devPulse{0%,100%{box-shadow:0 0 15px rgba(255,107,107,.5)}50%{box-shadow:0 0 30px rgba(255,107,107,1)}}
+.coin-area{position:relative;width:200px;height:200px;margin:0 auto 20px;perspective:800px;}
+.coin{width:100%;height:100%;position:relative;transform-style:preserve-3d;animation:coinFloat 3s ease-in-out infinite;}
+@keyframes coinFloat{0%,100%{transform:translateY(0) rotateY(0)}50%{transform:translateY(-10px) rotateY(20deg)}}
+.coin-face{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff8d0,#ffd700 40%,#b8860b 80%,#7a5a10);border:6px solid #8a6a10;display:flex;flex-direction:column;justify-content:center;align-items:center;box-shadow:inset 0 0 30px rgba(140,100,10,.6),0 0 40px rgba(255,215,0,.5);}
+.coin-face .icon{font-size:5em;line-height:1;text-shadow:0 0 20px rgba(255,255,255,.5)}
+.coin-face .label{font-size:.7em;font-weight:900;letter-spacing:3px;color:#5a3a0a;margin-top:8px;text-transform:uppercase}
+.soon-text{font-size:1.1em;color:#ffd700;font-weight:900;letter-spacing:3px;text-transform:uppercase;text-shadow:0 0 20px rgba(255,215,0,.8);margin-bottom:8px;}
+.soon-sub{font-size:.8em;color:#d4af37;letter-spacing:1px;line-height:1.5;max-width:400px;margin:0 auto 20px;opacity:.85;}
+.btn-disabled{width:100%;padding:14px;border-radius:12px;background:linear-gradient(180deg,#333,#111);color:#666;border:3px solid #444;font-family:Georgia;font-weight:900;font-size:1em;letter-spacing:2px;text-transform:uppercase;cursor:not-allowed;margin-bottom:8px;}
+.plans{margin-top:20px;padding:14px;background:rgba(0,0,0,.4);border:1.5px solid rgba(212,175,55,.3);border-radius:12px;text-align:left;}
+.plans-title{color:#d4af37;font-size:.7em;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:10px;text-align:center;}
+.plan-item{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:.75em;color:#ccc;}
+.plan-item .cross{color:#ff6b6b;font-weight:900;font-size:1.1em}
+.plan-item .text{flex:1}
+@media(max-width:500px){h1{font-size:1.3em;letter-spacing:4px}.coin-area{width:150px;height:150px}.coin-face .icon{font-size:3.5em}.soon-text{font-size:.9em}}
+</style>
+</head>
+<body>
+<script src="sync.js"></script>
+
+<div class="c">
+  <div class="top">
+    <a href="index.html" class="back">← НАЗАД</a>
+    <div class="bal-box"><span>👑</span><div><div class="lbl">Баланс</div><div class="num">₽<span id="bal">0</span></div></div></div>
+  </div>
+
+  <h1>🪙 МОНЕТКА</h1>
+  <div class="subtitle">✦ Орёл · Решка ✦</div>
+
+  <div class="panel">
+    <div class="dev-badge">🚧 В РАЗРАБОТКЕ</div>
+    <div class="coin-area">
+      <div class="coin"><div class="coin-face"><div class="icon">👑</div><div class="label">KINGWIN</div></div></div>
+    </div>
+    <div class="soon-text">Скоро здесь будет игра</div>
+    <div class="soon-sub">Мы делаем честную монетку с анимацией подброса, звуками и множителями. Следи за обновлениями!</div>
+    <button class="btn-disabled" disabled>🪙 СКОРО ОТКРОЕТСЯ</button>
+    <div class="plans">
+      <div class="plans-title">📋 Что будет в игре</div>
+      <div class="plan-item"><span class="cross">✗</span><span class="text">Подброс монетки с анимацией</span></div>
+      <div class="plan-item"><span class="cross">✗</span><span class="text">Выбор: орёл или решка</span></div>
+      <div class="plan-item"><span class="cross">✗</span><span class="text">Множитель ×2 за угадывание</span></div>
+      <div class="plan-item"><span class="cross">✗</span><span class="text">История бросков</span></div>
+      <div class="plan-item"><span class="cross">✗</span><span class="text">Звуки и анимации в стиле KINGWIN</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+var B = getRealBalance();
+function saveB(){ setRealBalance(B); }
+function uUI(){ saveB(); document.getElementById('bal').textContent = fmt(B); }
+uUI();
+</script>
+</body>
+</html>

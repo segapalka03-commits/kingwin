@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>🪜 ЛЕСЕНКА — KINGWIN</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Georgia,serif}
+body{background: radial-gradient(ellipse at 50% 0%, #5a0f0f 0%, #2a0808 40%, #150505 70%, #0a0202 100%); color:#fff;min-height:100vh;padding:10px;display:flex;justify-content:center;align-items:flex-start}
+.c{width:100%;max-width:760px;margin:0 auto}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:8px;flex-wrap:wrap}
+.back{padding:7px 14px;border-radius:10px;background:linear-gradient(180deg,#2a0808,#1a0505);border:2px solid #d4af37;color:#ffd700;text-decoration:none;font-size:.75em;font-weight:700;letter-spacing:1px}
+.back:hover{transform:translateX(-3px);box-shadow:0 0 18px rgba(212,175,55,.7)}
+.bal-box{display:flex;align-items:center;gap:8px;padding:9px 16px;background:linear-gradient(180deg,#2a0808,#1a0505);border:3px solid #d4af37;border-radius:12px;box-shadow:0 0 0 1px #8a6a10 inset,0 0 22px rgba(212,175,55,.5);min-width:160px}
+.bal-box .lbl{font-size:.5em;font-weight:700;letter-spacing:2px;color:#d4af37;margin-bottom:2px;text-transform:uppercase}
+.bal-box .num{font-size:1em;font-weight:700;background:linear-gradient(180deg,#fff8d0,#ffd700 50%,#b8860b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-variant-numeric:tabular-nums}
+h1{text-align:center;font-size:1.5em;font-weight:800;letter-spacing:7px;background:linear-gradient(180deg,#fff8d0,#ffd700 40%,#b8860b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:2px}
+.subtitle{text-align:center;color:#d4af37;font-size:.55em;letter-spacing:4px;margin-bottom:10px;text-transform:uppercase;opacity:.85}
+.layout{display:grid;grid-template-columns:1fr 270px;gap:10px;align-items:start}
+@media(max-width:700px){.layout{grid-template-columns:1fr}}
+.ladder-wrap{background:linear-gradient(180deg,rgba(42,8,8,.95),rgba(10,2,2,.98));border:2px solid #d4af37;border-radius:14px;padding:10px;box-shadow:0 0 25px rgba(212,175,55,.3);max-height:640px;overflow-y:auto;}
+.ladder-wrap::-webkit-scrollbar{width:6px}
+.ladder-wrap::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#d4af37,#8a6a10);border-radius:3px}
+.ladder{display:flex;flex-direction:column-reverse;gap:3px}
+.step{display:flex;justify-content:space-between;align-items:center;padding:5px 10px;border-radius:7px;background:rgba(0,0,0,.4);border:1.5px solid rgba(212,175,55,.3);font-size:.75em;transition:all .2s;min-height:28px;}
+.step .num{font-family:Arial;font-weight:700;color:#d4af37;font-size:.85em;min-width:22px}
+.step .mult{font-family:Arial;font-weight:900;color:#ffd700;font-size:.85em}
+.step .chance{font-size:.7em;color:#8a6a10}
+.step.passed{background:linear-gradient(90deg,rgba(10,58,42,.9),rgba(5,29,21,.95));border-color:#1dd1a1;box-shadow:0 0 10px rgba(29,209,161,.4);}
+.step.passed .mult, .step.passed .num{color:#1dd1a1}
+.step.current{background:linear-gradient(90deg,rgba(58,42,10,.95),rgba(29,21,5,.98));border-color:#ffd700;border-width:2px;box-shadow:0 0 18px rgba(255,215,0,.7);animation:stepPulse 1.2s infinite;}
+.step.current .num, .step.current .mult, .step.current .chance{color:#ffd700}
+.step.current .mult{font-size:1em}
+@keyframes stepPulse{0%,100%{box-shadow:0 0 15px rgba(255,215,0,.5)}50%{box-shadow:0 0 25px rgba(255,215,0,1)}}
+.step.failed{background:linear-gradient(90deg,rgba(90,10,10,.95),rgba(42,5,5,.98));border-color:#ff4444;box-shadow:0 0 15px rgba(255,68,68,.7);animation:shake .4s;}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.sliders-box{background:rgba(0,0,0,.4);border:1.5px solid rgba(212,175,55,.4);border-radius:10px;padding:8px;margin-bottom:8px;}
+.slider-row{margin-bottom:8px}
+.slider-row:last-child{margin-bottom:0}
+.slider-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.slider-header .lbl{font-size:.7em;color:#d4af37;letter-spacing:1px;text-transform:uppercase;font-weight:700}
+.slider-header .val{font-size:.9em;color:#ffd700;font-weight:900;font-family:Arial}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:8px;border-radius:4px;outline:none;cursor:pointer;}
+.slider-steps input[type=range]{background:linear-gradient(90deg,#1dd1a1,#48dbfb)}
+.slider-stones input[type=range]{background:linear-gradient(90deg,#ffd700,#ff6b6b)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff4b0,#ffd700 50%,#b8860b);border:2px solid #ffd700;cursor:pointer;box-shadow:0 0 10px rgba(255,215,0,.9);}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff4b0,#ffd700 50%,#b8860b);border:2px solid #ffd700;cursor:pointer;box-shadow:0 0 10px rgba(255,215,0,.9);}
+.panel{background:linear-gradient(180deg,rgba(42,8,8,.95),rgba(10,2,2,.98));border:2px solid #d4af37;border-radius:14px;padding:12px;box-shadow:0 0 25px rgba(212,175,55,.3)}
+.mult-box{background:rgba(0,0,0,.5);border:2px solid #d4af37;border-radius:10px;padding:8px 12px;text-align:center;margin-bottom:8px}
+.mult-box .lbl{font-size:.55em;color:#d4af37;letter-spacing:2px;text-transform:uppercase}
+.mult-box .val{font-size:1.4em;color:#ffd700;font-weight:900;font-family:Arial;text-shadow:0 0 15px rgba(255,215,0,.6)}
+.mult-box .val.green{color:#1dd1a1;text-shadow:0 0 15px rgba(29,209,161,.8)}
+.bet-field{display:flex;align-items:center;gap:6px;padding:6px 12px;background:linear-gradient(180deg,#3a0a0a,#1a0505);border:2px solid #ffd700;border-radius:9px;margin-bottom:8px;box-shadow:0 0 12px rgba(255,215,0,.4)}
+.bet-field .lbl{font-size:.7em;color:#ffd700;font-weight:700}
+.bet-field input{flex:1;padding:4px;background:transparent;border:none;color:#fff8d0;font-size:1em;font-weight:900;text-align:right;font-family:Arial;outline:none}
+.quick-bets{display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap;justify-content:center}
+.qbet{padding:5px 9px;border-radius:7px;background:linear-gradient(180deg,#2a0808,#1a0505);border:1.5px solid #d4af37;color:#ffd700;font-weight:700;font-size:.68em;font-family:Georgia;cursor:pointer;transition:all .15s}
+.qbet:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 0 10px rgba(212,175,55,.6)}
+.qbet:disabled{opacity:.4;cursor:not-allowed}
+.btn-start,.btn-up,.btn-cashout{width:100%;padding:12px;border-radius:10px;font-family:Georgia;font-weight:900;font-size:.95em;letter-spacing:2px;cursor:pointer;text-transform:uppercase;transition:all .15s;border:3px solid;margin-bottom:6px}
+.btn-start{background:linear-gradient(180deg,#ffd700,#b8860b);color:#0a0505;border-color:#ffd700;box-shadow:0 5px 0 #7a5a10,0 0 20px rgba(255,215,0,.4)}
+.btn-start:hover{transform:translateY(-2px);box-shadow:0 5px 0 #7a5a10,0 0 35px rgba(255,215,0,.9)}
+.btn-start:active{transform:translateY(3px);box-shadow:0 2px 0 #7a5a10}
+.btn-start:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+.btn-up{background:linear-gradient(180deg,#1dd1a1,#0a8a6a);color:#0a1a14;border-color:#1dd1a1;box-shadow:0 5px 0 #063d32,0 0 20px rgba(29,209,161,.4);display:none}
+.btn-up.on{display:block}
+.btn-up:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 5px 0 #063d32,0 0 30px rgba(29,209,161,.9)}
+.btn-up:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+.btn-cashout{background:linear-gradient(180deg,#feca57,#d4af37);color:#0a0505;border-color:#feca57;box-shadow:0 5px 0 #7a5a10,0 0 20px rgba(254,202,87,.6);display:none}
+.btn-cashout.on{display:block}
+.btn-cashout:disabled{opacity:.4;cursor:not-allowed;box-shadow:none;animation:none;transform:none!important}
+.btn-cashout:not(:disabled){animation:cashPulse 1.5s infinite}
+@keyframes cashPulse{0%,100%{box-shadow:0 5px 0 #7a5a10,0 0 18px rgba(254,202,87,.5)}50%{box-shadow:0 5px 0 #7a5a10,0 0 36px rgba(254,202,87,1)}}
+.btn-cashout:hover:not(:disabled){transform:translateY(-2px)}
+#status{font-size:.72em;color:#1dd1a1;min-height:36px;margin:4px 0;text-align:center;letter-spacing:.3px;line-height:1.4}
+.float-text{position:fixed;font-size:1.8em;font-weight:900;color:#ffd700;text-shadow:0 0 25px rgba(255,215,0,1);pointer-events:none;z-index:200;animation:floatUp 2s ease-out forwards}
+@keyframes floatUp{0%{opacity:0;transform:translateY(0) scale(.5)}20%{opacity:1;transform:translateY(-30px) scale(1.3)}100%{opacity:0;transform:translateY(-180px) scale(1)}}
+.flash{position:fixed;inset:0;background:radial-gradient(circle,rgba(29,209,161,.4),transparent 60%);pointer-events:none;z-index:90;animation:flashFade .9s ease-out forwards}
+@keyframes flashFade{from{opacity:1}to{opacity:0}}
+</style>
+</head>
+<body>
+
+<div class="c">
+  <div class="top">
+    <a href="index.html" class="back">← НАЗАД</a>
+    <div class="bal-box">
+      <span>👑</span>
+      <div>
+        <div class="lbl">Баланс</div>
+        <div class="num">₽<span id="bal">0</span></div>
+      </div>
+    </div>
+  </div>
+
+  <h1>🪜 ЛЕСЕНКА</h1>
+  <div class="subtitle">✦ Настрой сложность ✦</div>
+
+  <div class="layout">
+    <div class="ladder-wrap">
+      <div class="ladder" id="ladder"></div>
+    </div>
+
+    <div class="panel">
+      <div class="mult-box">
+        <div class="lbl">💰 Множитель</div>
+        <div class="val" id="multVal">×1.00</div>
+      </div>
+
+      <div class="sliders-box" id="slidersBox">
+        <div class="slider-row slider-steps">
+          <div class="slider-header">
+            <span class="lbl">🪜 Ступеней</span>
+            <span class="val" id="stepsVal">10</span>
+          </div>
+          <input type="range" id="stepsRange" min="5" max="25" value="10" step="1">
+        </div>
+        <div class="slider-row slider-stones">
+          <div class="slider-header">
+            <span class="lbl">💣 Камней</span>
+            <span class="val" id="stonesVal">3</span>
+          </div>
+          <input type="range" id="stonesRange" min="1" max="24" value="3" step="1">
+        </div>
+      </div>
+
+      <div class="quick-bets" id="quickBets">
+        <button class="qbet" onclick="setBet(50)">50</button>
+        <button class="qbet" onclick="setBet(100)">100</button>
+        <button class="qbet" onclick="setBet(200)">200</button>
+        <button class="qbet" onclick="setBet(500)">500</button>
+        <button class="qbet" onclick="setBet(1000)">1000</button>
+      </div>
+
+      <div class="bet-field">
+        <span class="lbl">💰 ₽</span>
+        <input type="number" id="bet" value="100" min="10" max="1000" step="10">
+      </div>
+
+      <button class="btn-start" id="startBtn">🪜 НАЧАТЬ</button>
+      <button class="btn-up" id="upBtn" disabled>⬆️ ВВЕРХ</button>
+      <button class="btn-cashout" id="cashoutBtn" disabled>💰 ЗАБРАТЬ</button>
+
+      <div id="status">Настрой лестницу и жми НАЧАТЬ</div>
+    </div>
+  </div>
+</div>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<script>
+var firebaseConfig = {
+  apiKey: "AIzaSyC8PI8bCzGB_tODO6MnOKAjkxXaASbA3vM",
+  authDomain: "kingwin-260a8.firebaseapp.com",
+  databaseURL: "https://kingwin-260a8-default-rtdb.firebaseio.com",
+  projectId: "kingwin-260a8",
+  storageBucket: "kingwin-260a8.firebasestorage.app",
+  messagingSenderId: "1085884746167",
+  appId: "1:1085884746167:web:9962cbc9eb5c876ae78032"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+var CURRENT_USER_KEY = 'kw_current_user';
+var B = 0;
+var HOUSE_EDGE = 0.03;
+var totalSteps = 10;
+var totalStones = 3;
+var playing = false;
+var currentBet = 0;
+var currentMult = 1;
+var currentStep = 0;
+
+function $(id){ return document.getElementById(id); }
+function fmt(n){
+  var r = Math.round(n*100)/100;
+  if(r%1===0) return Math.floor(r).toLocaleString('ru-RU');
+  return r.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+}
+function setBet(v){ if(playing) return; $('bet').value = v; }
+
+// ==================== БАЛАНС ====================
+function loadBalance(){
+  var uid = localStorage.getItem(CURRENT_USER_KEY);
+  if(!uid){ window.location.replace('auth.html?need_auth=1'); return; }
+  firebase.database().ref('users/' + uid).once('value').then(function(snapshot){
+    var user = snapshot.val();
+    if(!user){
+      localStorage.removeItem(CURRENT_USER_KEY);
+      window.location.replace('auth.html?need_auth=1');
+      return;
+    }
+    B = (user.realBalance || 0) + (user.bonusBalance || 0);
+    $('bal').textContent = fmt(B);
+  });
+}
+
+function setBalDisplay(newTotal){
+  B = newTotal;
+  $('bal').textContent = fmt(B);
+}
+
+// ==================== SAFE CHANGE ====================
+async function safeChangeBalance(delta, type){
+  var uid = localStorage.getItem(CURRENT_USER_KEY);
+  if(!uid) return null;
+  var user = firebase.auth().currentUser;
+  if(!user) return null;
+
+  try{
+    var idToken = await user.getIdToken();
+    var resp = await fetch('/.netlify/functions/updateBalance', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + idToken },
+      body: JSON.stringify({ delta: delta, type: type || 'game' })
+    });
+    if(!resp.ok){
+      console.error('updateBalance error', resp.status, await resp.text());
+      return null;
+    }
+    var data = await resp.json();
+    return data.total;
+  }catch(e){
+    console.error('safeChangeBalance exception', e);
+    return null;
+  }
+}
+
+// ==================== ЗВУКИ ====================
+var AC = null;
+function getAC(){ try{ if(!AC) AC = new (window.AudioContext||window.webkitAudioContext)(); if(AC.state === 'suspended') AC.resume(); return AC; }catch(e){ return null; } }
+function sStep(){try{var c=getAC();if(!c)return;var o=c.createOscillator();o.type='sine';o.frequency.setValueAtTime(600,c.currentTime);o.frequency.exponentialRampToValueAtTime(900,c.currentTime+.1);var g=c.createGain();g.gain.setValueAtTime(.07,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.15);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.17)}catch(e){}}
+function sFall(){try{var c=getAC();if(!c)return;var o=c.createOscillator();o.type='sawtooth';o.frequency.setValueAtTime(300,c.currentTime);o.frequency.exponentialRampToValueAtTime(80,c.currentTime+.4);var g=c.createGain();g.gain.setValueAtTime(.2,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.5);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.55)}catch(e){}}
+function sWin(){try{var c=getAC();if(!c)return;[523,659,784,1047].forEach(function(f,i){setTimeout(function(){try{var o=c.createOscillator();o.type='triangle';o.frequency.value=f;var g=c.createGain();g.gain.setValueAtTime(.16,c.currentTime);g.gain.exponentialRampToValueAtTime(.01,c.currentTime+.35);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.4)}catch(e){}},i*80)})}catch(e){}}
+
+// ==================== ЛЕСТЕНКА ====================
+function getStepChance(){ return 1 - (totalStones / totalSteps); }
+
+function calcMult(k){
+  if(k === 0) return 1;
+  var p = getStepChance();
+  var m = Math.pow(1 - HOUSE_EDGE, 1) / Math.pow(p, k);
+  return Math.min(m, 5000);
+}
+
+function renderLadder(){
+  var el = $('ladder');
+  el.innerHTML = '';
+  for(var i=0;i<totalSteps;i++){
+    var stepNum = i + 1;
+    var mult = calcMult(stepNum);
+    var chance = Math.round(getStepChance() * 100);
+    var cls = 'step';
+    var icon = '';
+    if(i < currentStep) { cls += ' passed'; icon = '💎'; }
+    else if(i === currentStep && playing) { cls += ' current'; icon = '⬆️'; }
+    else if(i === currentStep && !playing && currentStep > 0) { cls += ' current'; }
+    var div = document.createElement('div');
+    div.className = cls;
+    div.innerHTML =
+      '<span class="num">' + stepNum + '.</span>' +
+      '<span class="mult">×' + mult.toFixed(2) + '</span>' +
+      '<span class="chance">' + chance + '% ' + icon + '</span>';
+    el.appendChild(div);
+  }
+}
+
+$('stepsRange').oninput = function(){
+  if(playing) return;
+  totalSteps = parseInt(this.value);
+  $('stepsVal').textContent = totalSteps;
+  if(totalStones >= totalSteps){
+    totalStones = totalSteps - 1;
+    $('stonesRange').value = totalStones;
+    $('stonesVal').textContent = totalStones;
+  }
+  $('stonesRange').max = totalSteps - 1;
+  renderLadder();
+  updateUI();
+};
+
+$('stonesRange').oninput = function(){
+  if(playing) return;
+  totalStones = parseInt(this.value);
+  $('stonesVal').textContent = totalStones;
+  renderLadder();
+  updateUI();
+};
+
+// ==================== СТАРТ ====================
+$('startBtn').onclick = async function(){
+  if(playing) return;
+  var bet = parseInt($('bet').value) || 0;
+  if(bet < 10){ alert('Мин. ставка 10₽'); return; }
+  if(bet > 1000){ alert('Макс. ставка 1000₽'); return; }
+  if(bet > B){ alert('Мало денег'); return; }
+
+  // Списываем ставку через сервер
+  var newTotal = await safeChangeBalance(-bet, 'bet');
+  if(newTotal === null){ alert('❌ Ошибка списания ставки'); return; }
+  setBalDisplay(newTotal);
+
+  currentBet = bet;
+  currentMult = 1;
+  currentStep = 0;
+  playing = true;
+
+  $('stepsRange').disabled = true;
+  $('stonesRange').disabled = true;
+  $('startBtn').disabled = true;
+  $('upBtn').disabled = false;
+  $('upBtn').classList.add('on');
+  $('cashoutBtn').classList.remove('on');
+  $('cashoutBtn').disabled = true;
+
+  renderLadder();
+  updateUI();
+};
+
+// ==================== ШАГ ВВЕРХ ====================
+$('upBtn').onclick = function(){
+  if(!playing) return;
+  if(currentStep >= totalSteps) return;
+
+  var chance = getStepChance();
+  var success = Math.random() < chance;
+
+  if(success){
+    currentStep++;
+    currentMult = calcMult(currentStep);
+    sStep();
+    renderLadder();
+    updateUI();
+
+    if(currentStep >= totalSteps){
+      $('status').textContent = '🏆 Прошёл всё! Забираю...';
+      setTimeout(cashOut, 600);
+    }
+  } else {
+    playing = false;
+    sFall();
+
+    var el = $('ladder');
+    var steps = el.querySelectorAll('.step');
+    if(steps[currentStep]) steps[currentStep].classList.add('failed');
+
+    $('status').innerHTML =
+      '💥 Упал на ступени ' + (currentStep + 1) +
+      ' · потеряно <b style="color:#ff6b6b">₽' + fmt(currentBet) + '</b>' +
+      ' · могли забрать <b style="color:#1dd1a1">₽' + fmt(Math.floor(currentBet * currentMult)) + '</b>';
+
+    $('upBtn').disabled = true;
+    $('upBtn').classList.remove('on');
+    $('cashoutBtn').classList.remove('on');
+    $('cashoutBtn').disabled = true;
+    $('startBtn').disabled = false;
+    $('stepsRange').disabled = false;
+    $('stonesRange').disabled = false;
+    $('multVal').className = 'val';
+
+    setTimeout(function(){
+      currentBet = 0;
+      currentMult = 1;
+      currentStep = 0;
+      $('multVal').textContent = '×1.00';
+      updateUI();
+      renderLadder();
+    }, 2500);
+  }
+};
+
+// ==================== КЭШАУТ ====================
+$('cashoutBtn').onclick = function(){ cashOut(); };
+
+async function cashOut(){
+  if(!playing) return;
+  if(currentStep === 0) return;
+
+  var win = Math.floor(currentBet * currentMult);
+
+  // Начисляем выигрыш через сервер
+  var newTotal = await safeChangeBalance(win, 'win');
+  if(newTotal !== null) setBalDisplay(newTotal);
+
+  sWin();
+  flashGreen();
+  floatText('+₽' + fmt(win));
+
+  $('status').innerHTML =
+    '✅ Забрал <b style="color:#1dd1a1">₽' + fmt(win) + '</b> · ×' + currentMult.toFixed(2) +
+    ' (ступень ' + currentStep + '/' + totalSteps + ')';
+  $('multVal').textContent = '+₽' + fmt(win);
+  $('multVal').className = 'val green';
+
+  playing = false;
+  $('upBtn').disabled = true;
+  $('upBtn').classList.remove('on');
+  $('cashoutBtn').classList.remove('on');
+  $('cashoutBtn').disabled = true;
+  $('startBtn').disabled = false;
+  $('stepsRange').disabled = false;
+  $('stonesRange').disabled = false;
+
+  setTimeout(function(){
+    currentBet = 0;
+    currentMult = 1;
+    currentStep = 0;
+    $('multVal').textContent = '×1.00';
+    $('multVal').className = 'val';
+    updateUI();
+    renderLadder();
+  }, 2000);
+}
+
+// ==================== UI ====================
+function updateUI(){
+  $('multVal').textContent = '×' + currentMult.toFixed(2);
+  $('multVal').className = currentMult > 1.001 ? 'val green' : 'val';
+
+  if(playing && currentStep > 0){
+    $('cashoutBtn').disabled = false;
+    $('cashoutBtn').classList.add('on');
+    $('cashoutBtn').textContent = '💰 ЗАБРАТЬ ₽' + fmt(Math.floor(currentBet * currentMult));
+
+    var nextChance = Math.round(getStepChance() * 100);
+    var nextWin = Math.floor(currentBet * calcMult(currentStep + 1));
+    var curWin = Math.floor(currentBet * currentMult);
+    $('status').innerHTML =
+      'Пройдено: <b>' + currentStep + '/' + totalSteps + '</b> · ×' + currentMult.toFixed(2) +
+      '<br><span style="color:#1dd1a1">⬆️ Дальше: ' + nextChance + '% → +₽' + fmt(nextWin - curWin) + ' (итого ₽' + fmt(nextWin) + ')</span>' +
+      ' · <span style="color:#ff6b6b">💥 Падение: −₽' + fmt(currentBet) + '</span>';
+  } else if(playing){
+    var firstChance = Math.round(getStepChance() * 100);
+    var firstWin = Math.floor(currentBet * calcMult(1));
+    $('status').innerHTML =
+      'Жми ВВЕРХ · <span style="color:#1dd1a1">' + firstChance + '% → ₽' + fmt(firstWin) + '</span>' +
+      ' · <span style="color:#ff6b6b">Падение: −₽' + fmt(currentBet) + '</span>';
+  } else {
+    var maxMult = calcMult(totalSteps);
+    $('status').innerHTML =
+      'Ступеней: <b>' + totalSteps + '</b> · Камней: <b>' + totalStones + '</b>' +
+      '<br><span style="color:#1dd1a1">Макс ×' + maxMult.toFixed(2) + ' · шанс на шаг ' + Math.round(getStepChance()*100) + '%</span>';
+  }
+}
+
+function flashGreen(){
+  var f = document.createElement('div');
+  f.className = 'flash';
+  document.body.appendChild(f);
+  setTimeout(function(){ f.remove(); }, 900);
+}
+function floatText(text){
+  var el = document.createElement('div');
+  el.className = 'float-text';
+  el.textContent = text;
+  el.style.left = '50%'; el.style.top = '50%';
+  el.style.transform = 'translateX(-50%)';
+  document.body.appendChild(el);
+  setTimeout(function(){ el.remove(); }, 2000);
+}
+
+// ==================== СТАРТ ====================
+renderLadder();
+updateUI();
+loadBalance();
+</script>
+</body>
+</html>

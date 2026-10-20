@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>👑 KINGWIN</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+html, body { height: 100%; overflow-x: hidden; }
+body{background: #0a0202; background-image: radial-gradient(ellipse at 50% 0%, #3a0808 0%, #150505 50%, #0a0202 100%); color:#fff; min-height:100vh; display:flex; position: relative;}
+
+.sparkles {position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden}
+.sparkles span{position:absolute;background:#ffd700;border-radius:50%;box-shadow:0 0 10px #ffd700,0 0 20px #b8860b;animation:fall linear infinite;opacity:0}
+@keyframes fall{0%{transform:translateY(-10vh) scale(0);opacity:0}10%{opacity:1;transform:translateY(0) scale(1)}90%{opacity:1}100%{transform:translateY(110vh) scale(0);opacity:0}}
+
+/* Сайдбар */
+.sidebar{
+  width: 80px;
+  background: rgba(15, 5, 5, 0.8);
+  border-right: 1px solid rgba(212, 175, 55, 0.2);
+  display: flex; flex-direction: column; align-items: center;
+  padding: 20px 0; gap: 12px;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  overflow-y: auto;
+  max-height: 100vh;
+}
+.sidebar::-webkit-scrollbar { width: 0px; background: transparent; }
+
+.sidebar .nav-icon{
+  width: 48px; height: 48px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5em; cursor: pointer; text-decoration: none;
+  background: rgba(255,255,255,0.03); color: #8a6a10;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.sidebar .nav-icon:hover{
+  background: rgba(212, 175, 55, 0.2);
+  color: #ffd700;
+  transform: scale(1.1);
+}
+.sidebar .nav-icon.active{
+  background: #d4af37; color: #0a0505;
+  box-shadow: 0 0 15px rgba(212,175,55,0.6);
+}
+
+.main-content{flex:1;display:flex;flex-direction:column;position:relative;z-index:10;padding:20px 40px;max-width:1400px;margin:0 auto;width:100%}
+
+/* Верхняя панель */
+.top-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;gap:20px;flex-wrap:wrap}
+.top-nav{display:flex;gap:24px;align-items:center}
+.top-nav a{color:#a89a8a;text-decoration:none;font-size:0.95em;font-weight:700;display:flex;align-items:center;gap:6px;transition:color 0.2s}
+.top-nav a:hover, .top-nav a.active{color:#ffd700}
+.top-nav .badge{background:#ff4444;color:#fff;font-size:0.6em;padding:2px 6px;border-radius:8px;font-weight:900}
+
+/* Правый блок */
+.top-right{display:flex;gap:16px;align-items:center}
+
+/* Зелёная кнопка Пополнить */
+.btn-deposit{
+  position: relative; display: flex; align-items: center; gap: 8px;
+  padding: 12px 28px; border-radius: 14px;
+  background: linear-gradient(180deg, #0a3a1a 0%, #051a0a 100%);
+  color: #1dd1a1; font-family: Georgia, serif; font-weight: 900; font-size: 0.95em;
+  letter-spacing: 1.5px; text-transform: uppercase; text-decoration: none; white-space: nowrap;
+  border: 2px solid #1dd1a1; outline: 2px solid #0a8a6a; outline-offset: -5px;
+  box-shadow: 0 0 15px rgba(29, 209, 161, 0.4), 0 8px 20px rgba(0,0,0,0.8), 0 0 0 1px rgba(29, 209, 161, 0.3) inset;
+  overflow: hidden; transition: all 0.3s ease; z-index: 1;
+}
+.btn-deposit::before {
+  content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(29, 209, 161, 0.4), transparent);
+  transform: skewX(-20deg); animation: shineCard 4s infinite; z-index: 2; pointer-events: none;
+}
+@keyframes shineCard { 0% { left: -100%; } 20% { left: 100%; } 100% { left: 100%; } }
+.btn-deposit::after {
+  content: '👑'; position: absolute; top: -6px; right: 4px; font-size: 1em;
+  filter: drop-shadow(0 0 5px #1dd1a1); z-index: 3; animation: floatCrown 3s ease-in-out infinite;
+}
+@keyframes floatCrown { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-3px) rotate(10deg); } }
+.btn-deposit span {
+  position: relative; z-index: 4; background: linear-gradient(180deg, #ffffff 0%, #1dd1a1 50%, #0a8a6a 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.8); display: flex; align-items: center; gap: 6px;
+}
+.btn-deposit:hover { transform: translateY(-3px) scale(1.02); border-color: #7dffc4; box-shadow: 0 0 25px rgba(29, 209, 161, 0.8), 0 12px 25px rgba(0,0,0,0.9), 0 0 0 1px rgba(29, 209, 161, 0.6) inset; }
+.btn-deposit:active { transform: translateY(2px) scale(0.98); box-shadow: 0 0 10px rgba(29, 209, 161, 0.4), 0 4px 10px rgba(0,0,0,0.8); }
+
+/* Зелёный баланс */
+.bal-box{
+  position:relative; display:flex; align-items:center; gap:14px;
+  padding:10px 24px; background:linear-gradient(180deg, #0a3a1a 0%, #051a0a 100%);
+  border:2px solid #1dd1a1; outline:2px solid #0a8a6a; outline-offset:-5px;
+  border-radius:14px; box-shadow:0 0 15px rgba(29, 209, 161, 0.6), 0 8px 20px rgba(0,0,0,0.9);
+  overflow:hidden; transition:all 0.3s; cursor:pointer;
+}
+.bal-box::before{
+  content:''; position:absolute; top:0; left:-100%; width:50%; height:100%;
+  background:linear-gradient(90deg, transparent, rgba(29, 209, 161, 0.4), transparent);
+  animation:shine 3s infinite; z-index:1;
+}
+@keyframes shine{0%{left:-100%}20%{left:100%}100%{left:100%}}
+.bal-box .lbl{ font-size:0.75em; color:#1dd1a1; letter-spacing:2px; text-transform:uppercase; font-weight:900; z-index:2 }
+.bal-box .num{ font-size:1.5em; font-weight:900; font-family:Arial; background:linear-gradient(180deg, #ffffff 0%, #1dd1a1 50%, #0a8a6a 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; display:flex; align-items:center; gap:4px; z-index:2 }
+.bal-box .num span{color:#fff; -webkit-text-fill-color:#fff; text-shadow:0 0 10px rgba(255,255,255,0.5)}
+.bal-box:hover{transform:scale(1.02); box-shadow:0 0 25px rgba(29, 209, 161, 0.8), 0 10px 25px rgba(0,0,0,0.9);}
+
+/* Профиль */
+.profile-btn{
+  width:56px;height:56px;border-radius:50%;
+  background:linear-gradient(180deg, #2a0808, #0a0202);
+  border:2px solid #ffd700;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.6em;text-decoration:none;cursor:pointer;
+  box-shadow:0 0 15px rgba(255,215,0,0.5);
+  transition:all .2s;
+}
+.profile-btn:hover{ transform:scale(1.1); box-shadow:0 0 25px rgba(255,215,0,0.9); }
+
+/* Модалка баланса */
+.balance-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(5px); }
+.balance-modal.on { display: flex; }
+.bal-modal-box { background: linear-gradient(180deg, #0a3a1a, #051a0a); border: 2px solid #1dd1a1; border-radius: 16px; padding: 24px; width: 100%; max-width: 350px; box-shadow: 0 0 40px rgba(29,209,161,0.5); position: relative; }
+.bal-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 0.95em;}
+.bal-row .lbl { color: #a89a8a; }
+.bal-row .val.real { color: #1dd1a1; font-weight: 900; font-family: Arial; }
+.bal-row .val.bonus { color: #feca57; font-weight: 900; font-family: Arial; }
+.bal-divider { height: 1px; background: rgba(29,209,161,0.2); margin: 12px 0; }
+.bal-wager { font-size: 0.8em; color: #ff6b6b; text-align: center; margin-top: 10px; }
+.bal-close { width: 100%; padding: 12px; margin-top: 16px; border-radius: 10px; border: 1px solid #1dd1a1; background: transparent; color: #1dd1a1; font-weight: 700; cursor: pointer;}
+.bal-close:hover { background: rgba(29,209,161,0.1); }
+
+/* Баннеры */
+.banners-row{display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:20px}
+.hero-banner{position:relative;border-radius:16px;overflow:hidden;border:2px solid rgba(212, 175, 55, 0.4);background:linear-gradient(135deg, #1a0505, #0a0202);display:flex;align-items:center;justify-content:space-between;min-height:280px;box-shadow:0 10px 30px rgba(0,0,0,0.6), inset 0 0 50px rgba(255, 215, 0, 0.05);padding:0 40px}
+.hero-content{position:relative;z-index:2;max-width:60%}
+.hero-badge{display:inline-block;background:#ff4444;color:#fff;font-size:0.7em;font-weight:900;letter-spacing:1px;padding:4px 10px;border-radius:6px;margin-bottom:15px;box-shadow:0 0 15px rgba(255, 68, 68, 0.5)}
+.hero-content h2{font-size:2.2em;font-weight:900;text-transform:uppercase;letter-spacing:2px;background:linear-gradient(180deg, #fff8d0, #ffd700, #b8860b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:10px;line-height:1.1}
+.hero-content p{font-size:1.1em;color:#fff;margin-bottom:25px;text-shadow:0 2px 5px #000;font-weight:700;line-height:1.4}
+.hero-btn{display:inline-block;padding:14px 28px;border-radius:10px;background:linear-gradient(180deg, #ffd700, #b8860b);color:#0a0505;font-weight:900;text-decoration:none;font-size:0.95em;letter-spacing:1px;box-shadow:0 4px 0 #7a5a10;transition:all 0.2s}
+.hero-btn:hover{transform:translateY(-2px);box-shadow:0 6px 0 #7a5a10, 0 0 25px rgba(255,215,0,0.8)}
+.hero-image{position:relative;z-index:2;height:100%;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 0 40px rgba(255,215,0,0.4))}
+.hero-image img{max-height:260px;width:auto;object-fit:contain;transition:transform 0.3s}
+.hero-banner:hover .hero-image img{transform:scale(1.05) rotate(2deg)}
+
+.side-banner{border-radius:16px;overflow:hidden;position:relative;border:2px solid rgba(212, 175, 55, 0.3);background:linear-gradient(180deg, #2a0808, #0a0202);padding:30px 20px;text-align:center;display:flex;flex-direction:column;justify-content:center;box-shadow:0 10px 30px rgba(0,0,0,0.6)}
+.side-banner h3{font-size:1.4em;color:#fff;font-weight:900;margin-bottom:10px}
+.side-banner p{font-size:0.85em;color:#aaa;margin-bottom:20px}
+.side-banner .btn{background:#48dbfb;color:#0a0505;padding:10px 20px;border-radius:10px;text-decoration:none;font-weight:900;font-size:0.9em;box-shadow:0 4px 0 #0a3a5a;display:inline-block}
+.side-banner .btn:hover{transform:translateY(-2px);box-shadow:0 6px 0 #0a3a5a}
+
+.mid-banner{background:linear-gradient(90deg, #4a0f0f, #8a1515, #4a0f0f);border:2px solid #d4af37;border-radius:12px;padding:16px 30px;display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;box-shadow:0 5px 20px rgba(0,0,0,0.5)}
+.mid-banner h3{color:#fff;font-size:1.2em;margin:0;letter-spacing:1px}
+.mid-banner .btn{background:#fff;color:#0a0505;padding:8px 20px;border-radius:8px;font-weight:900;text-decoration:none;font-size:0.85em}
+
+/* Сетка игр */
+.section-title{font-size:1.2em;font-weight:900;letter-spacing:1px;margin-bottom:16px;display:flex;align-items:center;gap:10px;color:#ffd700}
+.section-title .dot{width:6px;height:6px;background:#7c5cff;border-radius:50%;box-shadow:0 0 10px #7c5cff}
+.games{display:grid;grid-template-columns:repeat(6, 1fr);gap:16px;margin-bottom:40px}
+.game-card{background:linear-gradient(180deg, rgba(42,8,8,0.8), rgba(15,5,5,0.9));border:1px solid rgba(212, 175, 55, 0.2);border-radius:12px;overflow:hidden;cursor:pointer;transition:all 0.3s;text-decoration:none;color:#fff;display:flex;flex-direction:column}
+.game-card:hover{transform:translateY(-5px);border-color:#ffd700;box-shadow:0 15px 30px rgba(0,0,0,0.8), 0 0 20px rgba(255, 215, 0, 0.4)}
+.card-preview{aspect-ratio:1;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.card-preview .big-icon{font-size:3.5em;filter:drop-shadow(0 6px 16px rgba(0,0,0,.7));transition:transform .3s;z-index:2}
+.game-card:hover .card-preview .big-icon{transform:scale(1.1) rotate(-5deg)}
+.card-preview .card-img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;transition:transform .4s;z-index:1}
+.game-card:hover .card-preview .card-img{transform:scale(1.08)}
+.card-info{padding:10px;background:rgba(0,0,0,0.6);text-align:center;border-top:1px solid rgba(212,175,55,0.1)}
+.card-info .nm{font-size:0.9em;font-weight:900;color:#ffd700;display:block}
+.card-info .ds{font-size:0.65em;color:#a89a8a;font-weight:700;text-transform:uppercase}
+
+.bg-crash{background:radial-gradient(circle at 30% 30%, #ff6b6b, #8a1515 70%), linear-gradient(135deg,#4a0f0f,#2a0808)}
+.bg-cases{background:radial-gradient(circle at 70% 30%, #ffd700, #8a6a10 70%), linear-gradient(135deg,#3a2a0a,#1a1505)}
+.bg-dice{background:radial-gradient(circle at 50% 50%, #48dbfb, #0a3a5a 70%), linear-gradient(135deg,#0a2a4a,#051520)}
+.bg-keno{background:radial-gradient(circle at 50% 50%, #1dd1a1, #0a4a3a 70%), linear-gradient(135deg,#0a2a20,#051510)}
+.bg-hilo{background:radial-gradient(circle at 50% 50%, #feca57, #8a5a10 70%), linear-gradient(135deg,#3a2a0a,#1a1505)}
+.bg-miner{background:radial-gradient(circle at 50% 50%, #00d4ff, #0a3a4a 70%), linear-gradient(135deg,#0a2a3a,#051520)}
+.bg-ladder{background:radial-gradient(circle at 50% 50%, #a29bfe, #3a2a5a 70%), linear-gradient(135deg,#1a1530,#0a0818)}
+.bg-coin{background:radial-gradient(circle at 50% 50%, #ffd700, #8a6a10 70%), linear-gradient(135deg,#3a2a0a,#1a1505)}
+.bg-plinko{background:radial-gradient(circle at 50% 50%, #ff9fc9, #5a2a4a 70%), linear-gradient(135deg,#2a1020,#150510)}
+.bg-slots{background:radial-gradient(circle at 50% 50%, #ffd700, #8a1515 70%), linear-gradient(135deg,#4a0f0f,#2a0808)}
+
+@media(max-width: 1200px) { .games { grid-template-columns: repeat(4, 1fr); } }
+@media(max-width: 900px) { 
+  .banners-row { grid-template-columns: 1fr; }
+  .hero-banner { flex-direction: column; padding: 30px; text-align: center; }
+  .hero-content { max-width: 100%; }
+  .hero-image { margin-top: 20px; }
+  .games { grid-template-columns: repeat(3, 1fr); }
+  .sidebar { display: none; }
+  .main-content { padding: 15px; }
+}
+@media(max-width: 600px) { 
+  .games { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .top-nav { display: none; }
+  .hero-content h2 { font-size: 1.5em; }
+  .btn-deposit { padding: 10px 16px; font-size: 0.8em; }
+  .top-right { gap: 8px; }
+}
+</style>
+</head>
+<body>
+
+<div class="sparkles" id="sparkles"></div>
+
+<!-- Модалка баланса -->
+<div class="balance-modal" id="balanceModal">
+  <div class="bal-modal-box">
+    <div style="text-align: center; margin-bottom: 20px; font-size: 1.2em; font-weight: 900; color: #1dd1a1;">👑 ВАШ БАЛАНС</div>
+    <div class="bal-row"><span class="lbl">Реальный баланс</span><span class="val real" id="modalReal">₽0</span></div>
+    <div class="bal-row"><span class="lbl">Бонусный баланс</span><span class="val bonus" id="modalBonus">₽0</span></div>
+    <div class="bal-divider"></div>
+    <div class="bal-row"><span class="lbl" style="font-weight:700; color:#fff;">Всего</span><span class="val" id="modalTotal" style="color:#fff; font-weight:900; font-family:Arial;">₽0</span></div>
+    <div class="bal-wager" id="modalWagerText">Вейджер не активен</div>
+    <button class="bal-close" onclick="closeBalanceModal()">ЗАКРЫТЬ</button>
+  </div>
+</div>
+
+<div class="sidebar">
+  <a href="index.html" class="nav-icon active" title="Главная">🏠</a>
+  <a href="crash.html" class="nav-icon game-link" title="Crash">🚀</a>
+  <a href="cases.html" class="nav-icon game-link" title="Кейсы">📦</a>
+  <a href="dice.html" class="nav-icon game-link" title="Dice">🎲</a>
+  <a href="keno.html" class="nav-icon game-link" title="Keno">🎯</a>
+  <a href="hilo.html" class="nav-icon game-link" title="HiLo">🃏</a>
+  <a href="miner.html" class="nav-icon game-link" title="Минёр">💎</a>
+  <a href="ladder.html" class="nav-icon game-link" title="Лесенка">🪜</a>
+  <a href="coin.html" class="nav-icon game-link" title="Монетка">🪙</a>
+  <a href="plinko.html" class="nav-icon game-link" title="Plinko">🎯</a>
+  <a href="slots.html" class="nav-icon game-link" title="Слоты">🎰</a>
+</div>
+
+<div class="main-content">
+  
+  <div class="top-header">
+    <div class="top-nav">
+      <a href="index.html" class="active">🏠 Главная</a>
+      <a href="#">🎮 Игры</a>
+    </div>
+    
+    <div class="top-right">
+      <a href="deposit.html" class="btn-deposit game-link" id="depositBtn"><span>💳 ПОПОЛНИТЬ</span></a>
+      <div class="bal-box" id="balBox" onclick="openBalanceModal()" style="display:none;">
+        <div class="lbl">Баланс</div>
+        <div class="num">₽<span id="balVal">0</span></div>
+      </div>
+      <a href="auth.html" class="profile-btn" id="profileBtn" title="Войти">👤</a>
+    </div>
+  </div>
+
+  <div class="banners-row">
+    <div class="hero-banner">
+      <div class="hero-content">
+        <div class="hero-badge">🎁 НА ПЕРВЫЙ РАЗ</div>
+        <h2>ПРИВЕТСТВЕННЫЙ<br>БОНУС</h2>
+        <p>+100% к депозиту<br>от 200 ₽</p>
+        <a href="deposit.html" class="hero-btn game-link">💰 ПОПОЛНИТЬ С БОНУСОМ</a>
+      </div>
+      <div class="hero-image">
+        <img src="bonus.png" alt="Бонус" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'font-size:8em; filter:drop-shadow(0 0 30px #ffd700);\'>💰</div>';">
+      </div>
+    </div>
+
+    <div class="side-banner">
+      <h3>ВЫБЕРИ СВОЙ БОНУС!</h3>
+      <p>Открывай и забирай выгоду</p>
+      <a href="deposit.html" class="btn game-link">К бонусам</a>
+    </div>
+  </div>
+
+  <div class="mid-banner">
+    <h3>🎁 ОТКРЫВАЙ НОВЫЕ БОНУСЫ ЕЖЕДНЕВНО!</h3>
+    <a href="deposit.html" class="btn game-link">Посмотреть</a>
+  </div>
+
+  <div class="section-title">
+    <span class="dot"></span>
+    🔥 ПОПУЛЯРНЫЕ
+  </div>
+
+  <div class="games">
+    <a href="crash.html" class="game-card game-link">
+      <div class="card-preview bg-crash"><img src="crash.jpg" alt="Crash" class="card-img" onerror="this.style.display='none'; this.parentElement.innerHTML += '<div class=\'big-icon\'>🚀</div>';"></div>
+      <div class="card-info"><span class="nm">Crash</span><span class="ds">Kingwin</span></div>
+    </a>
+
+    <a href="cases.html" class="game-card game-link">
+      <div class="card-preview bg-cases"><img src="cases.png" alt="Кейсы" class="card-img" onerror="this.style.display='none'; this.parentElement.innerHTML += '<div class=\'big-icon\'>📦</div>';"></div>
+      <div class="card-info"><span class="nm">Кейсы</span><span class="ds">Kingwin</span></div>
+    </a>
+
+    <a href="dice.html" class="game-card game-link">
+      <div class="card-preview bg-dice"><img src="dice.jpg" alt="DICE" class="card-img" onerror="this.style.display='none'; this.parentElement.innerHTML += '<div class=\'big-icon\'>🎲</div>';"></div>
+      <div class="card-info"><span class="nm">DICE</span><span class="ds">Kingwin</span></div>
+    </a>
+
+    <a href="keno.html" class="game-card game-link">
+      <div class="card-preview bg-keno"><img src="keno.jpg" alt="KENO" class="card-img" onerror="this.style.display='none'; this.parentElement.innerHTML += '<div class=\'big-icon\'>🎯</div>';"></div>
+      <div class="card-info"><span class="nm">Keno</span><span class="ds">Kingwin</span></div>
+    </a>
+
+    <a href="hilo.html" class="game-card game-link">
+      <div class="card-preview bg-hilo"><img src="hilo.jpg" alt="HiLo" class="card-img" onerror="this.style.display='none'; this.parentElement.innerHTML += '<div class=\'big-icon\'>🃏</div>';"></div>
+      <div class="card-info"><span class="nm">HiLo</span><span class="ds">Kingwin</span></div>
+    </a>
+
+    <a href="miner.html" class="game-card game-link">
+      <div class="card-preview bg-miner"><img src="miner.jpg" alt="Минёр" class="card-img" onerror="this.style.display='none'; this.parentElement.innerHTML += '<div class=\'big-icon\'>💎</div>';"></div>
+      <div class="card-info"><span class="nm">Минёр</span><span class="ds">Kingwin</span></div>
+    </a>
+
+    <a href="ladder.html" class="game-card game-link">
+      <div class="card-preview bg-ladder"><img src="ladder.jpg" alt="Лесенка" class="card-img" onerror="this.style.display='none'; this.parentElement.innerHTML += '<div class=\'big-icon\'>🪜</div>';"></div>
+      <div class="card-info"><span class="nm">Лесенка</span><span class="ds">Kingwin</span></div>
+    </a>
+
+    <a href="coin.html" class="game-card game-link">
+      <div class="card-preview bg-coin"><img src="coin.jpg" alt="Монетка" class="card-img" onerror="this.style.display='none'; this.parentElement.innerHTML += '<div class=\'big-icon\'>🪙</div>';"></div>
+      <div class="card-info"><span class="nm">Монетка</span><span class="ds">Kingwin</span></div>
+    </a>
+
+    <a href="plinko.html" class="game-card game-link">
+      <div class="card-preview bg-plinko"><img src="plinko.jpg" alt="Plinko" class="card-img" onerror="this.style.display='none'; this.parentElement.innerHTML += '<div class=\'big-icon\'>🎯</div>';"></div>
+      <div class="card-info"><span class="nm">Plinko</span><span class="ds">Kingwin</span></div>
+    </a>
+
+    <a href="slots.html" class="game-card game-link">
+      <div class="card-preview bg-slots"><img src="slots.jpg" alt="Слоты" class="card-img" onerror="this.style.display='none'; this.parentElement.innerHTML += '<div class=\'big-icon\'>🎰</div>';"></div>
+      <div class="card-info"><span class="nm">Слоты</span><span class="ds">Kingwin</span></div>
+    </a>
+  </div>
+</div>
+
+<!-- ================= FIREBASE ================= -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<script>
+var firebaseConfig = {
+  apiKey: "AIzaSyC8PI8bCzGB_tODO6MnOKAjkxXaASbA3vM",
+  authDomain: "kingwin-260a8.firebaseapp.com",
+  databaseURL: "https://kingwin-260a8-default-rtdb.firebaseio.com",
+  projectId: "kingwin-260a8",
+  storageBucket: "kingwin-260a8.firebasestorage.app",
+  messagingSenderId: "1085884746167",
+  appId: "1:1085884746167:web:9962cbc9eb5c876ae78032"
+};
+
+firebase.initializeApp(firebaseConfig);
+var db = firebase.database();
+
+var CURRENT_USER_KEY = 'kw_current_user';
+
+function fmt(n){ return Math.floor(n).toLocaleString('ru-RU'); }
+
+// ✅ Функция для безопасных ключей (как в auth.html)
+function safeKey(email) {
+  return email.replace(/\./g, '_dot_')
+              .replace(/#/g, '_hash_')
+              .replace(/\$/g, '_dollar_')
+              .replace(/\[/g, '_lb_')
+              .replace(/\]/g, '_rb_');
+}
+
+function updateUI() {
+  var email = localStorage.getItem(CURRENT_USER_KEY);
+  var profileBtn = document.getElementById('profileBtn');
+  var balBox = document.getElementById('balBox');
+  var balVal = document.getElementById('balVal');
+  var gameLinks = document.querySelectorAll('.game-link');
+  
+  if(email) {
+    // ✅ Теперь используем safeKey при запросе к Firebase
+    var key = safeKey(email);
+    
+    db.ref('users/' + key).once('value').then(function(snapshot){
+      var u = snapshot.val();
+      if(!u) {
+        localStorage.removeItem(CURRENT_USER_KEY);
+        blockAccess();
+        return;
+      }
+      
+      profileBtn.textContent = u.avatar || '👑';
+      profileBtn.href = 'profile.html';
+      
+      var total = (u.realBalance || 0) + (u.bonusBalance || 0);
+      
+      balBox.style.display = 'flex';
+      balVal.textContent = fmt(total);
+      
+      document.getElementById('modalReal').textContent = '₽' + fmt(u.realBalance || 0);
+      document.getElementById('modalBonus').textContent = '₽' + fmt(u.bonusBalance || 0);
+      document.getElementById('modalTotal').textContent = '₽' + fmt(total);
+      
+      var wagerText = document.getElementById('modalWagerText');
+      if(u.bonusWager > 0) {
+        wagerText.textContent = 'Для вывода нужно отыграть: ₽' + fmt(u.bonusWager);
+        wagerText.style.color = '#ff6b6b';
+      } else {
+        wagerText.textContent = '✅ Все средства доступны для вывода';
+        wagerText.style.color = '#1dd1a1';
+      }
+    });
+  } else {
+    blockAccess();
+  }
+  
+  function blockAccess() {
+    profileBtn.textContent = '👤';
+    profileBtn.href = 'auth.html';
+    balBox.style.display = 'none'; 
+    
+    gameLinks.forEach(function(link){
+      var href = link.getAttribute('href');
+      if(href && href !== '#' && href !== 'index.html') {
+        link.href = 'auth.html?need_auth=1';
+      }
+    });
+  }
+}
+
+function openBalanceModal() { document.getElementById('balanceModal').classList.add('on'); }
+function closeBalanceModal() { document.getElementById('balanceModal').classList.remove('on'); }
+
+updateUI();
+
+var sparklesContainer = document.getElementById('sparkles');
+for (var i = 0; i < 50; i++) {
+  var spark = document.createElement('span');
+  spark.style.left = Math.random() * 100 + 'vw';
+  var size = Math.random() * 4 + 2;
+  spark.style.width = size + 'px';
+  spark.style.height = size + 'px';
+  spark.style.animationDelay = Math.random() * 10 + 's';
+  spark.style.animationDuration = (Math.random() * 5 + 5) + 's';
+  spark.style.opacity = Math.random() * 0.8 + 0.2;
+  sparklesContainer.appendChild(spark);
+}
+</script>
+</body>
+</html>

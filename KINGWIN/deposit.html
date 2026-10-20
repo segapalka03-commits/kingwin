@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>💳 ПОПОЛНЕНИЕ — KINGWIN</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+body{background: radial-gradient(ellipse at 50% 0%, #3a0808 0%, #150505 50%, #0a0202 100%); color:#fff;min-height:100vh; display:flex; justify-content:center; align-items:center; position:relative; overflow:hidden;}
+.overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); z-index: 1; }
+.modal { position: relative; z-index: 10; background: linear-gradient(180deg, #2a0808 0%, #150202 100%); width: 100%; max-width: 480px; border-radius: 16px; border: 2px solid #d4af37; box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 30px rgba(212,175,55,0.2); overflow: hidden; display: flex; flex-direction: column; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.modal-title { font-size: 1em; font-weight: 700; color: #ccc; letter-spacing: 1px; text-transform: uppercase; }
+.close-btn { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #ccc; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 1.2em; transition: all 0.2s; }
+.close-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.modal-content { padding: 24px; }
+.method-display { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 16px; margin-bottom: 20px; background: rgba(255, 215, 0, 0.05); border: 2px solid #d4af37; border-radius: 12px; color: #ffd700; font-weight: 900; font-size: 1.1em; letter-spacing: 1px; box-shadow: 0 0 20px rgba(212, 175, 55, 0.2); }
+.sum-label { font-size: 0.85em; color: #aaa; margin-bottom: 12px; }
+.amount-input-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.btn-minus, .btn-plus { width: 44px; height: 44px; background: rgba(255,255,255,0.1); border: none; border-radius: 10px; color: #fff; font-size: 1.2em; cursor: pointer; transition: all 0.2s; display: flex; justify-content: center; align-items: center; }
+.btn-minus:hover, .btn-plus:hover { background: rgba(255,255,255,0.2); }
+.amount-input { flex: 1; height: 44px; background: #fff; border: none; border-radius: 10px; color: #000; font-size: 1.2em; font-weight: 700; text-align: center; outline: none; }
+.quick-amounts { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 24px; }
+.qa-btn { background: transparent; border: none; color: #aaa; font-size: 0.85em; cursor: pointer; transition: color 0.2s; }
+.qa-btn:hover { color: #ffd700; }
+.info-lines { font-size: 0.85em; color: #888; line-height: 1.6; margin-bottom: 24px; }
+.info-lines span { color: #fff; }
+.btn-continue { width: 100%; padding: 14px; border-radius: 10px; border: none; background: #ffd700; color: #0a0505; font-weight: 900; font-size: 1em; cursor: pointer; transition: all 0.2s; text-transform: uppercase; letter-spacing: 1px;}
+.btn-continue:hover { background: #ffea70; box-shadow: 0 0 25px rgba(255,215,0,0.5); }
+.btn-continue:disabled { opacity: 0.5; cursor: not-allowed; }
+.pay-screen { display: none; }
+.pay-screen.on { display: block; animation: fadeIn 0.3s; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.card-box { background: #111; border: 1px solid #333; border-radius: 12px; padding: 16px; margin-bottom: 20px; }
+.card-box .lbl { font-size: 0.75em; color: #888; margin-bottom: 6px; text-transform: uppercase;}
+.card-box .val { font-size: 1.1em; color: #fff; font-family: monospace; user-select: all; word-break: break-all; line-height: 1.4; }
+.card-box .copy-btn { font-size: 0.8em; color: #48dbfb; cursor: pointer; margin-top: 8px; display: inline-block; }
+.card-box .copy-btn:hover { text-decoration: underline; }
+.hint { font-size: 0.85em; color: #aaa; line-height: 1.5; margin-bottom: 20px; }
+.hint span { color: #ffd700; font-weight: bold; }
+.btn-paid { width: 100%; padding: 14px; border-radius: 10px; border: none; background: #1dd1a1; color: #0a1a14; font-weight: 700; font-size: 1em; cursor: pointer; transition: all 0.2s; }
+.btn-paid:hover { background: #10ac84; box-shadow: 0 0 20px rgba(29,209,161,0.5); }
+.btn-paid:disabled { opacity: 0.5; cursor: not-allowed; }
+.wait-screen { display: none; text-align: center; padding: 20px 0; }
+.wait-screen.on { display: block; }
+.spinner { width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.1); border-top-color: #ffd700; border-radius: 50%; margin: 0 auto 20px; animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.wait-title { font-size: 1.2em; color: #fff; margin-bottom: 8px; }
+.wait-sub { font-size: 0.85em; color: #888; }
+.success-screen { display: none; text-align: center; padding: 20px 0; }
+.success-screen.on { display: block; animation: popIn 0.5s; }
+@keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.success-icon { font-size: 4em; margin-bottom: 10px; }
+.success-title { font-size: 1.4em; font-weight: 900; color: #1dd1a1; margin-bottom: 10px; }
+.success-text { font-size: 0.9em; color: #ccc; margin-bottom: 20px; }
+.success-btn { display: inline-block; padding: 12px 30px; background: #48dbfb; color: #0a0505; text-decoration: none; border-radius: 10px; font-weight: 700; }
+.error-box { display: none; padding: 14px; margin-bottom: 16px; border-radius: 10px; background: rgba(255,107,107,.1); border: 1px solid rgba(255,107,107,.4); color: #ff6b6b; font-size: 0.9em; text-align: center; }
+.error-box.on { display: block; }
+@media(max-width: 500px) { .modal { max-width: 95%; } }
+</style>
+</head>
+<body>
+
+<div class="overlay"></div>
+
+<div class="modal">
+  <div class="modal-header">
+    <div class="modal-title">Пополнить баланс</div>
+    <button class="close-btn" onclick="window.location.href='index.html'">×</button>
+  </div>
+
+  <div class="modal-content">
+
+    <div class="error-box" id="errorBox"></div>
+
+    <div id="step1">
+      <div class="method-display">
+        <span style="font-size: 1.5em;">₿</span>
+        USDT (BSC-20 / BEP-20)
+      </div>
+      <div class="sum-label">Укажите сумму пополнения (в рублях)</div>
+      <div class="amount-input-wrapper">
+        <button class="btn-minus" onclick="changeAmount(-100)">−</button>
+        <input type="number" id="amountInput" class="amount-input" value="500" min="100" max="50000">
+        <button class="btn-plus" onclick="changeAmount(100)">+</button>
+      </div>
+      <div class="quick-amounts">
+        <button class="qa-btn" onclick="setAmount(200)">200</button>
+        <button class="qa-btn" onclick="setAmount(500)">500</button>
+        <button class="qa-btn" onclick="setAmount(1000)">1 000</button>
+        <button class="qa-btn" onclick="setAmount(2500)">2 500</button>
+        <button class="qa-btn" onclick="setAmount(5000)">5 000</button>
+      </div>
+      <div class="info-lines">
+        Сумма к оплате: <span id="payVal">500</span> ₽<br>
+        <span id="bonusText" style="color: #1dd1a1;">Будет зачислено: 1000 ₽ (С бонусом +100%)</span>
+      </div>
+      <button class="btn-continue" onclick="goToPay()">Продолжить</button>
+    </div>
+
+    <div class="pay-screen" id="step2">
+      <div style="text-align: center; margin-bottom: 16px;">
+        <div style="font-weight: 700; font-size: 1.1em;">Перевод в USDT (BSC-20)</div>
+      </div>
+      <div class="card-box">
+        <div class="lbl">Адрес кошелька (BEP-20)</div>
+        <!-- ⚠️ ЗАМЕНИ НА СВОЙ КОШЕЛЁК! -->
+        <div class="val" id="cryptoAddress">0xТВОЙ_КОШЕЛЁК_40_СИМВОЛОВ</div>
+        <div class="copy-btn" onclick="copyCryptoAddress()">📋 Скопировать</div>
+      </div>
+      <div class="hint" style="color: #ff6b6b;">
+        ⚠️ Внимание! Отправляйте только <span>USDT</span> в сети <span>BSC-20 (BEP-20)</span>. Другие монеты или сети будут потеряны.
+      </div>
+      <div class="hint">
+        ⚠️ <b>Внимание:</b><br>
+        В комментарии к переводу (если есть) укажите ваш ник:<br>
+        <span id="userNickLabel">Игрок</span><br><br>
+        К оплате: <span id="payVal2">500</span> ₽
+      </div>
+      <button class="btn-paid" id="paidBtn" onclick="markAsPaid()">Я перевел(а)</button>
+    </div>
+
+    <div class="wait-screen" id="step3">
+      <div class="spinner"></div>
+      <div class="wait-title">Проверяем перевод</div>
+      <div class="wait-sub">Обычно это занимает до 5 минут.<br>Пожалуйста, не закрывайте страницу.</div>
+    </div>
+
+    <div class="success-screen" id="step4">
+      <div class="success-icon">✅</div>
+      <div class="success-title">ЗАЯВКА СОЗДАНА!</div>
+      <div class="success-text">Ожидайте подтверждения администратора.<br>Средства зачислятся после проверки перевода.</div>
+      <a href="index.html" class="success-btn">🏠 НА ГЛАВНУЮ</a>
+    </div>
+
+  </div>
+</div>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<script>
+var firebaseConfig = {
+  apiKey: "AIzaSyC8PI8bCzGB_tODO6MnOKAjkxXaASbA3vM",
+  authDomain: "kingwin-260a8.firebaseapp.com",
+  databaseURL: "https://kingwin-260a8-default-rtdb.firebaseio.com",
+  projectId: "kingwin-260a8",
+  storageBucket: "kingwin-260a8.firebasestorage.app",
+  messagingSenderId: "1085884746167",
+  appId: "1:1085884746167:web:9962cbc9eb5c876ae78032"
+};
+
+firebase.initializeApp(firebaseConfig);
+var db = firebase.database();
+var auth = firebase.auth();
+
+var CURRENT_USER_KEY = 'kw_current_user';
+var currentAmount = 500;
+var currentRequestId = null;
+var timerInterval = null;
+
+function $(id){ return document.getElementById(id); }
+
+function showError(msg){
+  var e = $('errorBox');
+  e.textContent = msg;
+  e.classList.add('on');
+  setTimeout(function(){ e.classList.remove('on'); }, 6000);
+}
+
+function changeAmount(diff) {
+  var input = $('amountInput');
+  var val = parseInt(input.value) || 0;
+  val += diff;
+  if (val < 100) val = 100;
+  if (val > 50000) val = 50000;
+  input.value = val;
+  updateUI();
+}
+
+function setAmount(val) {
+  $('amountInput').value = val;
+  updateUI();
+}
+
+function updateUI() {
+  var val = parseInt($('amountInput').value) || 0;
+  currentAmount = val;
+  $('payVal').textContent = val;
+  $('payVal2').textContent = val;
+  var total = val * 2;
+  $('bonusText').textContent = 'Будет зачислено: ' + total + ' ₽ (С бонусом +100%)';
+}
+
+$('amountInput').addEventListener('input', updateUI);
+
+function goToPay() {
+  var uid = localStorage.getItem(CURRENT_USER_KEY);
+  if(!uid) {
+    alert('Вы не авторизованы!');
+    window.location.href = 'auth.html';
+    return;
+  }
+
+  db.ref('users/' + uid).once('value').then(function(snapshot){
+    var u = snapshot.val();
+    if(!u) {
+      showError('Пользователь не найден');
+      return;
+    }
+    $('userNickLabel').textContent = u.nick;
+    $('step1').style.display = 'none';
+    $('step2').classList.add('on');
+  }).catch(function(e){
+    showError('Ошибка: ' + e.message);
+  });
+}
+
+function copyCryptoAddress() {
+  var text = $('cryptoAddress').textContent;
+  navigator.clipboard.writeText(text).then(function(){
+    alert('✅ Адрес кошелька скопирован!');
+  });
+}
+
+async function markAsPaid() {
+  var uid = localStorage.getItem(CURRENT_USER_KEY);
+  if(!uid) return;
+
+  var user = auth.currentUser;
+  if(!user){
+    showError('Вы не авторизованы. Войдите заново.');
+    return;
+  }
+
+  $('paidBtn').disabled = true;
+  $('paidBtn').textContent = '⏳ Отправляем...';
+
+  try {
+    var idToken = await user.getIdToken();
+    var resp = await fetch('/.netlify/functions/requestDeposit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + idToken
+      },
+      body: JSON.stringify({ amount: currentAmount })
+    });
+
+    var data = await resp.json();
+
+    if (!resp.ok) {
+      throw new Error(data.error || 'Ошибка создания заявки');
+    }
+
+    currentRequestId = data.requestId;
+
+    $('step2').classList.remove('on');
+    $('step3').classList.add('on');
+
+    // Слушаем изменение статуса заявки
+    timerInterval = setInterval(function(){
+      db.ref('pending_deposits/' + currentRequestId).once('value').then(function(snap){
+        var req = snap.val();
+        if(req && req.status === 'confirmed'){
+          clearInterval(timerInterval);
+          $('step3').classList.remove('on');
+          $('step4').classList.add('on');
+          $('step4').querySelector('.success-title').textContent = 'СРЕДСТВА ЗАЧИСЛЕНЫ!';
+          $('step4').querySelector('.success-text').innerHTML = 'Ваш депозит успешно подтверждён.';
+        }
+      });
+    }, 3000);
+
+    // Если за 5 минут не подтвердили — показываем "ожидайте"
+    setTimeout(function(){
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        $('step3').classList.remove('on');
+        $('step4').classList.add('on');
+      }
+    }, 5 * 60 * 1000);
+
+  } catch(e) {
+    console.error('requestDeposit error:', e);
+    showError(e.message || 'Ошибка создания заявки');
+    $('paidBtn').disabled = false;
+    $('paidBtn').textContent = 'Я перевел(а)';
+  }
+}
+
+// Проверка авторизации
+auth.onAuthStateChanged(function(user){
+  if(user){
+    localStorage.setItem(CURRENT_USER_KEY, user.uid);
+  } else {
+    var uid = localStorage.getItem(CURRENT_USER_KEY);
+    if(!uid){
+      window.location.href = 'auth.html?need_auth=1';
+    }
+  }
+});
+
+updateUI();
+</script>
+</body>
+</html>

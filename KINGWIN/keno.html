@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>🎯 KENO — KINGWIN</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Georgia,serif}
+body{background: radial-gradient(ellipse at 50% 0%, #5a0f0f 0%, #2a0808 40%, #150505 70%, #0a0202 100%); color:#fff;min-height:100vh;padding:10px;display:flex;justify-content:center}
+.c{width:100%;max-width:800px;margin:0 auto}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px;flex-wrap:wrap}
+.back{padding:8px 16px;border-radius:10px;background:linear-gradient(180deg,#2a0808,#1a0505);border:2px solid #d4af37;color:#ffd700;text-decoration:none;font-size:.8em;font-weight:700;letter-spacing:1px}
+.back:hover{transform:translateX(-3px);box-shadow:0 0 20px rgba(212,175,55,.7)}
+.bal-box{display:flex;align-items:center;gap:8px;padding:10px 18px;background:linear-gradient(180deg,#2a0808,#1a0505);border:3px solid #d4af37;border-radius:12px;box-shadow:0 0 0 1px #8a6a10 inset,0 0 25px rgba(212,175,55,.5);min-width:170px}
+.bal-box .lbl{font-size:.55em;font-weight:700;letter-spacing:2px;color:#d4af37;margin-bottom:2px;text-transform:uppercase}
+.bal-box .num{font-size:1.1em;font-weight:700;background:linear-gradient(180deg,#fff8d0,#ffd700 50%,#b8860b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-variant-numeric:tabular-nums}
+h1{text-align:center;font-size:1.8em;font-weight:800;letter-spacing:8px;background:linear-gradient(180deg,#fff8d0,#ffd700 40%,#b8860b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:2px}
+.subtitle{text-align:center;color:#d4af37;font-size:.6em;letter-spacing:5px;margin-bottom:10px;text-transform:uppercase;opacity:.85}
+.grid-wrap{background:linear-gradient(180deg,rgba(42,8,8,.95),rgba(10,2,2,.98));border:2px solid #d4af37;border-radius:14px;padding:8px;margin-bottom:8px;box-shadow:0 0 25px rgba(212,175,55,.3);max-width:460px;margin-left:auto;margin-right:auto}
+.grid{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+.cell{aspect-ratio:1;border-radius:6px;background:linear-gradient(160deg,#2a0808,#1a0505);color:#d4af37;border:1.5px solid #4a2a5a;cursor:pointer;font-size:.9em;font-weight:900;font-family:Georgia;transition:all .15s;position:relative}
+.cell:hover:not(:disabled){transform:scale(1.1);border-color:#d4af37;color:#ffd700;box-shadow:0 0 10px rgba(212,175,55,.5)}
+.cell.selected{background:linear-gradient(180deg,#4a1a5a,#2a0a3a);border-color:#c084fc;color:#fff;box-shadow:0 0 12px rgba(192,132,252,.7);transform:scale(1.05)}
+.cell.drawn{background:linear-gradient(180deg,#ffd700,#b8860b);border-color:#fff3b0;color:#1a0520;animation:pop .5s cubic-bezier(.18,.89,.32,1.28);box-shadow:0 0 18px rgba(255,215,0,.9)}
+.cell.selected.drawn{background:linear-gradient(180deg,#1dd1a1,#0a8a6a);border-color:#7dffc4;color:#0a1a14;animation:popBig .6s cubic-bezier(.18,.89,.32,1.28);box-shadow:0 0 25px rgba(29,209,161,1),0 0 45px rgba(29,209,161,.5)}
+@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.25)}100%{transform:scale(1.08)}}
+@keyframes popBig{0%{transform:scale(1)}45%{transform:scale(1.35) rotate(-4deg)}70%{transform:scale(1.1) rotate(3deg)}100%{transform:scale(1.1)}}
+.info-panel{background:linear-gradient(180deg,rgba(42,8,8,.95),rgba(10,2,2,.98));border:2px solid #d4af37;border-radius:12px;padding:8px 12px;text-align:center;margin-bottom:8px;max-width:460px;margin-left:auto;margin-right:auto}
+.result-msg{font-size:.9em;font-weight:700;color:#d4af37;min-height:32px;display:flex;flex-direction:column;justify-content:center;align-items:center;letter-spacing:.5px}
+.result-msg .big{font-size:1.4em;color:#ffd700;margin:2px 0;text-shadow:0 0 15px rgba(255,215,0,.8)}
+.result-msg .big.green{color:#1dd1a1;text-shadow:0 0 15px rgba(29,209,161,.9)}
+.result-msg .big.red{color:#ff6b6b}
+.bet-controls{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;padding:8px;background:linear-gradient(180deg,rgba(42,8,8,.95),rgba(10,2,2,.98));border:2px solid #d4af37;border-radius:12px;margin-bottom:8px;max-width:460px;margin-left:auto;margin-right:auto}
+.quick-bets{display:flex;gap:4px;flex-wrap:wrap;justify-content:center}
+.qbet{padding:6px 10px;border-radius:8px;background:linear-gradient(180deg,#2a0808,#1a0505);border:1.5px solid #d4af37;color:#ffd700;font-weight:700;font-size:.7em;font-family:Georgia;cursor:pointer;transition:all .15s}
+.qbet:hover{transform:translateY(-2px)}
+.qbet.active{background:linear-gradient(180deg,#ffd700,#b8860b);color:#0a0505}
+.bet-field{display:flex;align-items:center;gap:6px;padding:6px 12px;background:linear-gradient(180deg,#3a0a0a,#1a0505);border:2px solid #ffd700;border-radius:10px;box-shadow:0 0 15px rgba(255,215,0,.4)}
+.bet-field .lbl{font-size:.7em;color:#ffd700;font-weight:700;letter-spacing:1px}
+.bet-field input{width:70px;padding:6px;background:transparent;border:none;color:#fff8d0;font-size:1em;font-weight:900;text-align:center;font-family:Arial;font-variant-numeric:tabular-nums}
+.bet-field input:focus{outline:none}
+.action-row{display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.btn-play{padding:12px 34px;border-radius:12px;border:3px solid #ffd700;background:linear-gradient(180deg,#ffd700,#b8860b);color:#0a0505;font-family:Georgia;font-size:.95em;font-weight:900;letter-spacing:2px;cursor:pointer;text-transform:uppercase;transition:all .15s;box-shadow:0 5px 0 #7a5a10,0 0 20px rgba(255,215,0,.4)}
+.btn-play:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 5px 0 #7a5a10,0 0 30px rgba(255,215,0,.9)}
+.btn-play:active:not(:disabled){transform:translateY(3px);box-shadow:0 2px 0 #7a5a10}
+.btn-play:disabled{opacity:.35;cursor:not-allowed;transform:none!important}
+.btn-clear{padding:12px 22px;border-radius:12px;border:2px solid #d4af37;background:linear-gradient(180deg,#3a0a0a,#1a0505);color:#ffd700;font-family:Georgia;font-size:.85em;font-weight:700;letter-spacing:1px;cursor:pointer}
+.btn-clear:hover:not(:disabled){box-shadow:0 0 15px rgba(212,175,55,.5)}
+.paytable{background:linear-gradient(180deg,rgba(42,8,8,.95),rgba(10,2,2,.98));border:2px solid #d4af37;border-radius:12px;padding:8px;margin-bottom:8px;max-width:460px;margin-left:auto;margin-right:auto}
+.paytable h3{color:#ffd700;text-align:center;font-size:.65em;letter-spacing:2px;margin-bottom:6px;text-transform:uppercase}
+.pt-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:4px}
+.pt-card{background:rgba(0,0,0,.4);border:1px solid rgba(212,175,55,.3);border-radius:8px;padding:4px 6px;font-size:.6em}
+.pt-card .ttl{color:#d4af37;font-weight:bold;margin-bottom:2px;text-align:center;letter-spacing:.5px}
+.pt-card .row{display:flex;justify-content:space-between;color:#ccc;font-family:Arial;font-size:.9em;padding:1px 0}
+.pt-card .row b{color:#1dd1a1}
+.float-text{position:fixed;font-size:2em;font-weight:900;color:#ffd700;text-shadow:0 0 25px rgba(255,215,0,1);pointer-events:none;z-index:200;animation:floatUp 2s ease-out forwards}
+@keyframes floatUp{0%{opacity:0;transform:translateY(0) scale(.5)}20%{opacity:1;transform:translateY(-30px) scale(1.3)}100%{opacity:0;transform:translateY(-180px) scale(1)}}
+.flash{position:fixed;inset:0;background:radial-gradient(circle,rgba(29,209,161,.4),transparent 60%);pointer-events:none;z-index:90;animation:flashFade .9s ease-out forwards}
+@keyframes flashFade{from{opacity:1}to{opacity:0}}
+@media(max-width:600px){
+  h1{font-size:1.4em;letter-spacing:4px}
+  .cell{font-size:.75em;border-radius:5px}
+  .pt-grid{grid-template-columns:repeat(2,1fr)}
+  .btn-play{padding:10px 24px;font-size:.85em}
+}
+</style>
+</head>
+<body>
+
+<div class="c">
+  <div class="top">
+    <a href="index.html" class="back">← НАЗАД</a>
+    <div class="bal-box">
+      <span>👑</span>
+      <div>
+        <div class="lbl">Баланс</div>
+        <div class="num">₽<span id="bal">0</span></div>
+      </div>
+    </div>
+  </div>
+
+  <h1>🎯 KENO</h1>
+  <div class="subtitle">✦ Выбери · Угадай · Побеждай ✦</div>
+
+  <div class="grid-wrap">
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <div class="info-panel">
+    <div class="result-msg" id="result">Выбери от 4 до 10 чисел</div>
+  </div>
+
+  <div class="bet-controls">
+    <div class="quick-bets">
+      <button class="qbet" onclick="setBet(50)">50</button>
+      <button class="qbet" onclick="setBet(100)">100</button>
+      <button class="qbet" onclick="setBet(200)">200</button>
+      <button class="qbet" onclick="setBet(500)">500</button>
+      <button class="qbet" onclick="setBet(1000)">1000</button>
+    </div>
+    <div class="bet-field">
+      <span class="lbl">💰 ₽</span>
+      <input type="number" id="bet" value="100" min="10" max="1000" step="10">
+    </div>
+  </div>
+
+  <div class="action-row">
+    <button class="btn-clear" id="clearBtn">🧹 ОЧИСТИТЬ</button>
+    <button class="btn-play" id="playBtn">🎯 ИГРАТЬ</button>
+  </div>
+
+  <div class="paytable">
+    <h3>💰 Выплаты (× ставка) · Макс ×100</h3>
+    <div class="pt-grid" id="ptGrid"></div>
+  </div>
+
+</div>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<script>
+var firebaseConfig = {
+  apiKey: "AIzaSyC8PI8bCzGB_tODO6MnOKAjkxXaASbA3vM",
+  authDomain: "kingwin-260a8.firebaseapp.com",
+  databaseURL: "https://kingwin-260a8-default-rtdb.firebaseio.com",
+  projectId: "kingwin-260a8",
+  storageBucket: "kingwin-260a8.firebasestorage.app",
+  messagingSenderId: "1085884746167",
+  appId: "1:1085884746167:web:9962cbc9eb5c876ae78032"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+var CURRENT_USER_KEY = 'kw_current_user';
+var B = 0;
+var TOTAL = 36, DRAW = 12, MAX_PICK = 10, MIN_PICK = 4;
+var selected = {}, pickCount = 0, playing = false;
+
+function $(i){ return document.getElementById(i); }
+function fmt(n){
+  var r = Math.round(n*100)/100;
+  if(r%1===0) return Math.floor(r).toLocaleString('ru-RU');
+  return r.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+}
+
+// ==================== БАЛАНС ====================
+function loadBalance(){
+  var uid = localStorage.getItem(CURRENT_USER_KEY);
+  if(!uid){ window.location.replace('auth.html?need_auth=1'); return; }
+  firebase.database().ref('users/' + uid).once('value').then(function(snapshot){
+    var user = snapshot.val();
+    if(!user){
+      localStorage.removeItem(CURRENT_USER_KEY);
+      window.location.replace('auth.html?need_auth=1');
+      return;
+    }
+    B = (user.realBalance || 0) + (user.bonusBalance || 0);
+    $('bal').textContent = fmt(B);
+  });
+}
+
+function setBalDisplay(newTotal){
+  B = newTotal;
+  $('bal').textContent = fmt(B);
+}
+
+// ==================== SAFE CHANGE ====================
+async function safeChangeBalance(delta, type){
+  var uid = localStorage.getItem(CURRENT_USER_KEY);
+  if(!uid) return null;
+  var user = firebase.auth().currentUser;
+  if(!user) return null;
+
+  try{
+    var idToken = await user.getIdToken();
+    var resp = await fetch('/.netlify/functions/updateBalance', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + idToken },
+      body: JSON.stringify({ delta: delta, type: type || 'game' })
+    });
+    if(!resp.ok){
+      console.error('updateBalance error', resp.status, await resp.text());
+      return null;
+    }
+    var data = await resp.json();
+    return data.total;
+  }catch(e){
+    console.error('safeChangeBalance exception', e);
+    return null;
+  }
+}
+
+function setBet(v){ if(playing) return; $('bet').value = v; }
+
+// ==================== ЗВУКИ ====================
+var AC = null;
+function getAC(){ if(!AC){ try{ AC = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } if(AC && AC.state === 'suspended') AC.resume(); return AC; }
+function sClick(){ var c = getAC(); if(!c) return; var o = c.createOscillator(); o.type='sine'; o.frequency.value=600; var g=c.createGain(); g.gain.setValueAtTime(.06,c.currentTime); g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.08); o.connect(g); g.connect(c.destination); o.start(); o.stop(c.currentTime+.09) }
+function sDraw(){ var c = getAC(); if(!c) return; var o=c.createOscillator(); o.type='sine'; o.frequency.setValueAtTime(800+Math.random()*300,c.currentTime); var g=c.createGain(); g.gain.setValueAtTime(.08,c.currentTime); g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.1); o.connect(g); g.connect(c.destination); o.start(); o.stop(c.currentTime+.12) }
+function sWin(){ var c = getAC(); if(!c) return; [523,659,784,1047,1319].forEach(function(f,i){ setTimeout(function(){ var o=c.createOscillator(); o.type='triangle'; o.frequency.value=f; var g=c.createGain(); g.gain.setValueAtTime(.18,c.currentTime); g.gain.exponentialRampToValueAtTime(.01,c.currentTime+.4); o.connect(g); g.connect(c.destination); o.start(); o.stop(c.currentTime+.45); }, i*90) }) }
+function sLose(){ var c = getAC(); if(!c) return; var o=c.createOscillator(); o.type='sine'; o.frequency.setValueAtTime(300,c.currentTime); o.frequency.exponentialRampToValueAtTime(180,c.currentTime+.4); var g=c.createGain(); g.gain.setValueAtTime(.1,c.currentTime); g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.5); var f=c.createBiquadFilter(); f.type='lowpass'; f.frequency.value=800; o.connect(f); f.connect(g); g.connect(c.destination); o.start(); o.stop(c.currentTime+.55) }
+
+// ==================== ТАБЛИЦА ВЫПЛАТ ====================
+var PAYTABLE = {
+  4:{2:1,3:3,4:30},
+  5:{3:1.5,4:8,5:100},
+  6:{3:1,4:4,5:20,6:100},
+  7:{4:1.5,5:6,6:30,7:100},
+  8:{5:2,6:10,7:40,8:100},
+  9:{5:1.5,6:5,7:20,8:50,9:100},
+  10:{5:1.5,6:4,7:15,8:40,9:80,10:100}
+};
+
+// ==================== ПОЛЕ ====================
+var cells = [];
+for(var i=1;i<=TOTAL;i++){
+  (function(num){
+    var btn = document.createElement('button');
+    btn.className = 'cell';
+    btn.textContent = num;
+    btn.onclick = function(){ toggleSelect(num, btn); };
+    $('grid').appendChild(btn);
+    cells.push(btn);
+  })(i);
+}
+
+function toggleSelect(num, btn){
+  if(playing) return;
+  if(selected[num]){
+    delete selected[num];
+    btn.classList.remove('selected');
+    pickCount--;
+  } else {
+    if(pickCount >= MAX_PICK) return;
+    selected[num] = true;
+    btn.classList.add('selected');
+    pickCount++;
+  }
+  sClick();
+  updateInfo();
+}
+
+function updateInfo(){
+  var hint = '';
+  if(pickCount < MIN_PICK){
+    hint = ' <span style="color:#ff6b6b;font-size:.85em">(мин. '+MIN_PICK+')</span>';
+  }
+  $('result').innerHTML = 'Выбрано: <span class="big">'+pickCount+'</span> из '+MAX_PICK+hint;
+}
+
+$('clearBtn').onclick = function(){
+  if(playing) return;
+  clearBoard();
+};
+
+function clearBoard(){
+  selected = {};
+  pickCount = 0;
+  cells.forEach(function(c){ c.classList.remove('selected','drawn'); });
+  updateInfo();
+}
+
+// ==================== ИГРА ====================
+$('playBtn').onclick = async function(){
+  if(playing) return;
+  var bet = parseInt($('bet').value) || 0;
+  if(pickCount < MIN_PICK){ alert('Выбери минимум '+MIN_PICK+' числа'); return; }
+  if(bet < 10){ alert('Минимальная ставка 10₽'); return; }
+  if(bet > 1000){ alert('Максимальная ставка 1000₽'); return; }
+  if(bet > B){ alert('Мало денег'); return; }
+
+  // Списываем ставку через сервер
+  var newTotal = await safeChangeBalance(-bet, 'bet');
+  if(newTotal === null){ alert('❌ Ошибка списания ставки'); return; }
+  setBalDisplay(newTotal);
+
+  playing = true;
+  $('playBtn').disabled = true;
+  $('clearBtn').disabled = true;
+
+  var pool = [];
+  while(pool.length < DRAW){
+    var n = Math.floor(Math.random() * TOTAL) + 1;
+    if(pool.indexOf(n) < 0) pool.push(n);
+  }
+
+  cells.forEach(function(c){ c.classList.remove('drawn'); });
+  $('result').innerHTML = '<span style="color:#ffd700">🎲 Вытягиваем...</span>';
+
+  var step = 0;
+  var timer = setInterval(function(){
+    var n = pool[step];
+    cells[n-1].classList.add('drawn');
+    sDraw();
+
+    if(selected[n]){
+      cells[n-1].animate(
+        [{boxShadow:'0 0 0 rgba(29,209,161,0)'},
+         {boxShadow:'0 0 40px rgba(29,209,161,1)'},
+         {boxShadow:'0 0 25px rgba(29,209,161,.8)'}],
+        {duration:500,easing:'ease-out'}
+      );
+    }
+
+    step++;
+    if(step >= pool.length){
+      clearInterval(timer);
+      setTimeout(finishRound, 300);
+    }
+  }, 200);
+};
+
+async function finishRound(){
+  var hits = 0;
+  var drawnSet = {};
+  cells.forEach(function(c,i){
+    if(c.classList.contains('drawn')) drawnSet[i+1] = true;
+  });
+  for(var k in selected) if(drawnSet[k]) hits++;
+
+  var pick = pickCount;
+  var bet = parseInt($('bet').value) || 0;
+  var mult = (PAYTABLE[pick] && PAYTABLE[pick][hits]) || 0;
+  var win = Math.floor(mult * bet);
+
+  // Начисляем выигрыш через сервер
+  if(win > 0){
+    var newTotal = await safeChangeBalance(win, 'win');
+    if(newTotal !== null) setBalDisplay(newTotal);
+  }
+
+  $('result').className = 'result-msg';
+  var html = 'Совпадений: <span class="big">'+hits+'</span> из '+pick+'<br>';
+  if(win > 0){
+    html += '<span class="big green">💰 +₽'+fmt(win)+'</span>';
+    sWin();
+    flashGreen();
+    floatText('+₽'+fmt(win));
+  } else {
+    html += '<span class="big red">😢 −₽'+fmt(bet)+'</span>';
+    sLose();
+  }
+  $('result').innerHTML = html;
+
+  playing = false;
+  $('playBtn').disabled = false;
+  $('clearBtn').disabled = false;
+}
+
+function flashGreen(){
+  var f = document.createElement('div');
+  f.className = 'flash';
+  document.body.appendChild(f);
+  setTimeout(function(){ f.remove(); }, 900);
+}
+
+function floatText(text){
+  var el = document.createElement('div');
+  el.className = 'float-text';
+  el.textContent = text;
+  el.style.left = '50%'; el.style.top = '50%';
+  el.style.transform = 'translateX(-50%)';
+  document.body.appendChild(el);
+  setTimeout(function(){ el.remove(); }, 2000);
+}
+
+function renderPaytable(){
+  var g = $('ptGrid');
+  var html = '';
+  for(var k=4;k<=10;k++){
+    var rows = '';
+    for(var h in PAYTABLE[k]){
+      rows += '<div class="row"><span>'+h+' совп.</span><b>×'+PAYTABLE[k][h]+'</b></div>';
+    }
+    html += '<div class="pt-card"><div class="ttl">'+k+' чисел</div>'+rows+'</div>';
+  }
+  g.innerHTML = html;
+}
+
+// ==================== СТАРТ ====================
+renderPaytable();
+updateInfo();
+loadBalance();
+</script>
+</body>
+</html>

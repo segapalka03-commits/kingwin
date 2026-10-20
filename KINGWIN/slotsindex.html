@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>🎰 СЛОТЫ — KINGWIN</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Georgia,serif}
+html,body{overflow-x:hidden}
+body{background:#1a0a05;color:#fff;position:relative;min-height:100vh}
+.sky{position:fixed;inset:0;z-index:0;overflow:hidden;background:radial-gradient(ellipse at 50% 0%,#4a0f0f 0%,#2a0808 30%,#1a0a05 70%,#0a0505 100%)}
+.curtain-left,.curtain-right{position:absolute;top:0;bottom:0;width:200px;background:repeating-linear-gradient(90deg,#4a0f0f 0px,#6a1515 20px,#4a0f0f 40px,#2a0808 60px,#4a0f0f 80px)}
+.curtain-left{left:0;border-right:3px solid #d4af37;box-shadow:inset -40px 0 80px rgba(0,0,0,.8),8px 0 30px rgba(0,0,0,.6)}
+.curtain-right{right:0;border-left:3px solid #d4af37;box-shadow:inset 40px 0 80px rgba(0,0,0,.8),-8px 0 30px rgba(0,0,0,.6)}
+.curtain-left::before,.curtain-right::before{content:'';position:absolute;top:0;left:0;right:0;height:50px;background:linear-gradient(180deg,#8a2020,#6a1515 60%,#4a0f0f);border-bottom:3px solid #d4af37}
+.marble-floor{position:absolute;bottom:0;left:0;right:0;height:100px;background:repeating-linear-gradient(90deg,rgba(212,175,55,.05) 0px,transparent 40px,rgba(212,175,55,.05) 40px,transparent 80px),linear-gradient(180deg,transparent,rgba(26,10,5,.9));border-top:2px solid rgba(212,175,55,.3)}
+.chandelier{position:absolute;top:0;width:200px;height:200px;pointer-events:none;background:radial-gradient(ellipse at 50% 0%,rgba(255,215,0,.4),transparent 60%);filter:blur(20px);animation:chandelierGlow 4s ease-in-out infinite alternate}
+.chandelier.c1{left:20%}
+.chandelier.c2{right:20%}
+@keyframes chandelierGlow{from{opacity:.5}to{opacity:1}}
+.dust{position:absolute;inset:0;pointer-events:none}
+.dust span{position:absolute;width:3px;height:3px;background:#ffd700;border-radius:50%;box-shadow:0 0 8px #ffd700;animation:dustFloat linear infinite}
+@keyframes dustFloat{0%{transform:translateY(100vh);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(-100px);opacity:0}}
+.bal-box{position:fixed;top:20px;right:20px;z-index:100;display:flex;align-items:center;gap:12px;padding:14px 26px;background:linear-gradient(180deg,#2a0808 0%,#1a0505 50%,#0a0202 100%);border:3px solid #d4af37;border-radius:14px;box-shadow:0 0 0 1px #8a6a10 inset,0 0 30px rgba(212,175,55,.5);overflow:hidden;min-width:210px}
+.bal-box::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,215,0,.3),transparent);animation:balShine 3s infinite;pointer-events:none}
+@keyframes balShine{0%{left:-100%}60%{left:100%}100%{left:100%}}
+.bal-box .lbl{font-size:.65em;font-weight:700;letter-spacing:3px;color:#d4af37;margin-bottom:4px;text-transform:uppercase}
+.bal-box .num{font-size:1.4em;font-weight:700;background:linear-gradient(180deg,#fff8d0,#ffd700 50%,#b8860b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-variant-numeric:tabular-nums}
+.bal-icon{font-size:1.5em}
+.wrap{position:relative;z-index:10;max-width:1000px;margin:0 auto;padding:60px 20px 80px}
+.back{display:inline-block;padding:10px 22px;border-radius:12px;background:linear-gradient(180deg,#2a0808,#1a0505);border:2px solid #d4af37;color:#ffd700;text-decoration:none;font-size:.85em;font-weight:700;letter-spacing:2px;margin-bottom:30px;transition:all .3s}
+.back:hover{transform:translateX(-4px);box-shadow:0 0 25px rgba(212,175,55,.7)}
+h1{text-align:center;font-size:3em;font-weight:800;letter-spacing:12px;background:linear-gradient(180deg,#fff8d0 0%,#ffd700 30%,#b8860b 60%,#ffd700 90%,#fff8d0 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-shadow:0 0 60px rgba(255,215,0,.6);margin-bottom:10px;animation:titleShine 5s ease-in-out infinite}
+@keyframes titleShine{0%,100%{filter:brightness(1) drop-shadow(0 0 30px rgba(255,215,0,.5))}50%{filter:brightness(1.35) drop-shadow(0 0 60px rgba(255,215,0,1))}}
+.subtitle{text-align:center;color:#d4af37;font-size:.85em;letter-spacing:10px;text-transform:uppercase;margin-bottom:40px;font-weight:600;text-shadow:0 0 15px rgba(212,175,55,.6)}
+.games{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;max-width:800px;margin:0 auto}
+.game-btn{display:block;padding:30px 20px;border-radius:18px;cursor:pointer;transition:all .3s;text-align:center;text-decoration:none;position:relative;overflow:hidden;border:2px solid #d4af37;background:linear-gradient(180deg,rgba(42,8,8,.9),rgba(26,10,5,.95));box-shadow:0 8px 30px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,215,0,.15)}
+.game-btn::before{content:'';position:absolute;inset:6px;border-radius:12px;border:1px solid rgba(212,175,55,.25);pointer-events:none;transition:all .3s}
+.game-btn:hover{transform:translateY(-6px) scale(1.02);box-shadow:0 20px 50px rgba(0,0,0,.7),0 0 50px rgba(212,175,55,.6);border-color:#ffd700}
+.game-btn:hover::before{border-color:rgba(255,215,0,.6)}
+.game-btn .ic{display:block;font-size:3.5em;margin-bottom:12px;transition:transform .3s;filter:drop-shadow(0 0 12px currentColor)}
+.game-btn:hover .ic{transform:scale(1.15) rotate(-5deg)}
+.game-btn .nm{font-weight:700;letter-spacing:3px;font-size:1.1em;display:block;margin-bottom:4px;color:#ffd700;text-shadow:0 0 12px rgba(255,215,0,.5)}
+.game-btn .ds{display:block;font-size:.7em;opacity:.75;letter-spacing:1px;color:#d4af37}
+.btn-kinghouse{color:#ffd700;border-color:#ffd700}
+.btn-more{color:#888;border-color:#666;opacity:.7;cursor:not-allowed}
+.btn-more:hover{transform:none!important;box-shadow:0 8px 30px rgba(0,0,0,.6)!important;border-color:#666!important}
+@media(max-width:700px){
+  .curtain-left,.curtain-right{width:40px}
+  h1{font-size:1.8em;letter-spacing:6px}
+  .subtitle{font-size:.6em;letter-spacing:5px}
+  .bal-box{top:10px;right:10px;padding:10px 16px;min-width:150px;gap:8px}
+  .bal-icon{font-size:1.1em}
+  .bal-box .lbl{font-size:.5em}
+  .bal-box .num{font-size:1em}
+  .games{grid-template-columns:1fr}
+  .game-btn{padding:24px 16px}
+  .game-btn .ic{font-size:3em}
+  .back{padding:8px 16px;font-size:.75em}
+  .wrap{padding:50px 14px 60px}
+}
+</style>
+</head>
+<body>
+
+<div class="sky">
+  <div class="curtain-left"></div>
+  <div class="curtain-right"></div>
+  <div class="chandelier c1"></div>
+  <div class="chandelier c2"></div>
+  <div class="marble-floor"></div>
+  <div class="dust" id="dust"></div>
+</div>
+
+<div class="bal-box">
+  <span class="bal-icon">👑</span>
+  <div>
+    <div class="lbl">Баланс</div>
+    <div class="num">₽<span id="balVal">150</span></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <a href="../index.html" class="back">← НА ГЛАВНУЮ</a>
+
+  <h1>🎰 СЛОТЫ</h1>
+  <div class="subtitle">✦ Крути · Лови · Побеждай ✦</div>
+
+  <div class="games">
+
+    <a href="kinghouse.html" class="game-btn btn-kinghouse">
+      <span class="ic">👑</span>
+      <span class="nm">KING HOUSE</span>
+      <span class="ds">Королевские слоты</span>
+    </a>
+
+    <div class="game-btn btn-more">
+      <span class="ic">✨</span>
+      <span class="nm">СКОРО</span>
+      <span class="ds">Новые слоты в разработке</span>
+    </div>
+
+    <div class="game-btn btn-more">
+      <span class="ic">✨</span>
+      <span class="nm">СКОРО</span>
+      <span class="ds">Новые слоты в разработке</span>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function(){
+  var d=document.getElementById('dust');
+  for(var i=0;i<25;i++){
+    var s=document.createElement('span');
+    s.style.left=Math.random()*100+'%';
+    s.style.animationDelay=(Math.random()*15)+'s';
+    s.style.animationDuration=(10+Math.random()*15)+'s';
+    s.style.opacity=Math.random()*.8+.2;
+    d.appendChild(s);
+  }
+})();
+var B=+(localStorage.getItem('kw_bal')||150);
+function fmt(n){return Math.floor(n).toLocaleString('ru-RU')}
+document.getElementById('balVal').textContent=fmt(B);
+</script>
+</body>
+</html>

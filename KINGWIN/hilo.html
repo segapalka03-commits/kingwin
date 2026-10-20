@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>🃏 HI-LO — KINGWIN</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Georgia,serif}
+body{background: radial-gradient(ellipse at 50% 0%, #5a0f0f 0%, #2a0808 40%, #150505 70%, #0a0202 100%); color:#fff;min-height:100vh;padding:20px;display:flex;justify-content:center}
+.c{width:100%;max-width:800px;margin:0 auto}
+
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;gap:12px;flex-wrap:wrap}
+.back{padding:10px 22px;border-radius:12px;background:linear-gradient(180deg,#2a0808,#1a0505);border:2px solid #d4af37;color:#ffd700;text-decoration:none;font-size:.85em;font-weight:700;letter-spacing:2px;transition:all .3s}
+.back:hover{transform:translateX(-4px);box-shadow:0 0 25px rgba(212,175,55,.7)}
+.bal-box{display:flex;align-items:center;gap:12px;padding:14px 26px;background:linear-gradient(180deg,#2a0808,#1a0505);border:3px solid #d4af37;border-radius:14px;box-shadow:0 0 0 1px #8a6a10 inset,0 0 30px rgba(212,175,55,.5);overflow:hidden;position:relative;min-width:210px}
+.bal-box .lbl{font-size:.65em;font-weight:700;letter-spacing:3px;color:#d4af37;margin-bottom:4px;text-transform:uppercase}
+.bal-box .num{font-size:1.4em;font-weight:700;background:linear-gradient(180deg,#fff8d0,#ffd700 50%,#b8860b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-variant-numeric:tabular-nums}
+
+h1{text-align:center;font-size:2.5em;font-weight:800;letter-spacing:10px;background:linear-gradient(180deg,#fff8d0,#ffd700 40%,#b8860b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px}
+.subtitle{text-align:center;color:#d4af37;font-size:.75em;letter-spacing:8px;margin-bottom:26px;text-transform:uppercase;opacity:.85}
+
+.game-panel{background:linear-gradient(180deg,rgba(42,8,8,.95),rgba(10,2,2,.98));border:2px solid #d4af37;border-radius:20px;padding:24px;box-shadow:0 0 40px rgba(212,175,55,.3),inset 0 0 30px rgba(0,0,0,.5);margin-bottom:20px;text-align:center;position:relative}
+.cards-area{display:flex;justify-content:center;align-items:center;gap:30px;margin-bottom:24px;perspective:1000px}
+.card-slot{width:120px;height:170px;border-radius:14px;display:flex;flex-direction:column;justify-content:space-between;padding:10px;font-family:Arial;font-weight:900;position:relative;transition:all .4s;box-shadow:0 10px 25px rgba(0,0,0,.6)}
+.card-slot.red{color:#e74c3c}
+.card-slot.black{color:#1a1a1a}
+.card-slot .top{font-size:1.4em;text-align:left;line-height:1}
+.card-slot .bottom{font-size:1.4em;text-align:right;transform:rotate(180deg);line-height:1}
+.card-slot .big{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:4em;opacity:.9}
+.card-slot.back{background:linear-gradient(135deg,#8a1515,#4a0a0a);border:3px solid #d4af37;display:flex;justify-content:center;align-items:center;color:#ffd700;font-size:3.5em;text-shadow:0 0 20px rgba(255,215,0,.8)}
+.card-slot.dealt{animation:dealCard .5s cubic-bezier(.18,.89,.32,1.28)}
+@keyframes dealCard{0%{transform:translateY(-100px) rotateY(180deg);opacity:0}100%{transform:translateY(0) rotateY(0);opacity:1}}
+.vs{font-size:2em;color:#d4af37;font-weight:900;text-shadow:0 0 15px rgba(212,175,55,.8)}
+
+.result-msg{font-size:1.1em;font-weight:700;min-height:50px;display:flex;flex-direction:column;justify-content:center;align-items:center;margin-bottom:16px;color:#d4af37;letter-spacing:1px;transition:all .3s}
+.result-msg.win{color:#1dd1a1;text-shadow:0 0 15px rgba(29,209,161,.6)}
+.result-msg.lose{color:#ff6b6b;text-shadow:0 0 15px rgba(255,107,107,.6)}
+.result-msg .big{font-size:1.6em;font-family:Arial;margin-top:4px}
+
+.action-row{display:flex;gap:14px;justify-content:center;margin-bottom:18px;flex-wrap:wrap}
+.btn-choice{flex:1;min-width:140px;padding:18px;border-radius:14px;font-family:Georgia;font-weight:900;font-size:1.1em;letter-spacing:2px;cursor:pointer;text-transform:uppercase;transition:all .15s;border:3px solid}
+.btn-high{background:linear-gradient(180deg,#1dd1a1,#0a8a6a);color:#0a1a14;border-color:#1dd1a1;box-shadow:0 6px 0 #063d32,0 0 25px rgba(29,209,161,.4)}
+.btn-high:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 0 #063d32,0 0 40px rgba(29,209,161,.8)}
+.btn-low{background:linear-gradient(180deg,#e74c3c,#a93226);color:#fff;border-color:#ff6b6b;box-shadow:0 6px 0 #6a1a14,0 0 25px rgba(231,76,60,.4)}
+.btn-low:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 0 #6a1a14,0 0 40px rgba(231,76,60,.8)}
+.btn-choice:active:not(:disabled){transform:translateY(4px);box-shadow:0 2px 0 currentColor}
+.btn-choice:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+.btn-choice .mult{display:block;font-size:.75em;margin-top:4px;opacity:.85}
+
+.btn-cashout{width:100%;padding:18px;border-radius:14px;font-family:Georgia;font-weight:900;font-size:1.1em;letter-spacing:2px;cursor:pointer;text-transform:uppercase;background:linear-gradient(180deg,#ffd700,#b8860b);color:#0a0505;border:3px solid #ffd700;box-shadow:0 6px 0 #7a5a10,0 0 25px rgba(255,215,0,.5);margin-bottom:14px;transition:all .15s;display:none}
+.btn-cashout.on{display:block}
+.btn-cashout:hover{transform:translateY(-2px);box-shadow:0 6px 0 #7a5a10,0 0 40px rgba(255,215,0,.9)}
+.btn-cashout:disabled{opacity:.4;cursor:not-allowed;transform:none}
+
+.bet-area{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+.quick-bets{display:flex;gap:8px}
+.qbet{padding:8px 16px;border-radius:10px;background:linear-gradient(180deg,#2a0808,#1a0505);border:2px solid #d4af37;color:#ffd700;font-weight:700;font-size:.9em;font-family:Georgia;cursor:pointer;transition:all .2s}
+.qbet:hover{transform:translateY(-2px);box-shadow:0 0 15px rgba(212,175,55,.6)}
+.bet-field{display:flex;align-items:center;gap:8px;padding:8px 18px;background:linear-gradient(180deg,#3a0a0a,#1a0505);border:2px solid #ffd700;border-radius:10px;box-shadow:0 0 15px rgba(255,215,0,.4)}
+.bet-field .lbl{font-size:.8em;color:#ffd700;font-weight:700}
+.bet-field input{width:100px;background:transparent;border:none;color:#fff8d0;font-size:1.1em;font-weight:900;text-align:center;font-family:Arial;outline:none}
+
+.history-title{color:#d4af37;font-size:.8em;letter-spacing:3px;text-transform:uppercase;text-align:center;margin:20px 0 10px}
+.history-list{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;min-height:40px}
+.hist-item{padding:6px 12px;border-radius:8px;font-weight:700;font-size:.85em;background:linear-gradient(180deg,#2a0808,#1a0505);border:1.5px solid #d4af37;font-family:Arial;animation:popIn .3s}
+.hist-item.win{color:#1dd1a1;border-color:#1dd1a1}
+.hist-item.lose{color:#ff6b6b;border-color:#ff6b6b}
+@keyframes popIn{from{transform:scale(0)}to{transform:scale(1)}}
+
+.float-text{position:fixed;font-size:2em;font-weight:900;color:#ffd700;text-shadow:0 0 25px rgba(255,215,0,1);pointer-events:none;z-index:200;animation:floatUp 2s ease-out forwards}
+@keyframes floatUp{0%{opacity:0;transform:translateY(0) scale(.5)}20%{opacity:1;transform:translateY(-30px) scale(1.3)}100%{opacity:0;transform:translateY(-180px) scale(1)}}
+
+@media(max-width:600px){
+  h1{font-size:1.6em;letter-spacing:5px}
+  .card-slot{width:90px;height:130px}
+  .card-slot .big{font-size:3em}
+  .btn-choice{padding:14px 10px;font-size:.9em}
+  .cards-area{gap:15px}
+}
+</style>
+</head>
+<body>
+
+<div class="c">
+  <div class="top">
+    <a href="index.html" class="back">← НАЗАД</a>
+    <div class="bal-box">
+      <span>👑</span>
+      <div>
+        <div class="lbl">Баланс</div>
+        <div class="num">₽<span id="bal">0</span></div>
+      </div>
+    </div>
+  </div>
+
+  <h1>🃏 HI-LO</h1>
+  <div class="subtitle">✦ ВЫШЕ · НИЖЕ · ЗАБИРАЙ ✦</div>
+
+  <div class="game-panel">
+    <div class="cards-area">
+      <div class="card-slot back" id="card1">?</div>
+      <div class="vs">VS</div>
+      <div class="card-slot back" id="card2">?</div>
+    </div>
+
+    <div class="result-msg" id="resultMsg">Сделай ставку и выбери: больше или меньше</div>
+
+    <div class="action-row">
+      <button class="btn-choice btn-high" id="btnHigh" disabled>
+        🔺 БОЛЬШЕ
+        <span class="mult" id="multHigh">×2.00</span>
+      </button>
+      <button class="btn-choice btn-low" id="btnLow" disabled>
+        🔻 МЕНЬШЕ
+        <span class="mult" id="multLow">×2.00</span>
+      </button>
+    </div>
+
+    <button class="btn-cashout" id="cashoutBtn">💰 ЗАБРАТЬ</button>
+
+    <div class="bet-area">
+      <div class="quick-bets">
+        <button class="qbet" onclick="setBet(50)">50</button>
+        <button class="qbet" onclick="setBet(100)">100</button>
+        <button class="qbet" onclick="setBet(500)">500</button>
+        <button class="qbet" onclick="setBet(1000)">1000</button>
+      </div>
+      <div class="bet-field">
+        <span class="lbl">💰 ₽</span>
+        <input type="number" id="bet" value="100" min="10" max="10000" step="10">
+      </div>
+    </div>
+  </div>
+
+  <div class="history-title">📜 Последние карты</div>
+  <div class="history-list" id="historyList"></div>
+</div>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<script>
+var firebaseConfig = {
+  apiKey: "AIzaSyC8PI8bCzGB_tODO6MnOKAjkxXaASbA3vM",
+  authDomain: "kingwin-260a8.firebaseapp.com",
+  databaseURL: "https://kingwin-260a8-default-rtdb.firebaseio.com",
+  projectId: "kingwin-260a8",
+  storageBucket: "kingwin-260a8.firebasestorage.app",
+  messagingSenderId: "1085884746167",
+  appId: "1:1085884746167:web:9962cbc9eb5c876ae78032"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+var CURRENT_USER_KEY = 'kw_current_user';
+var B = 0;
+var playing = false;
+var currentCard = null;
+var currentBet = 0;
+var currentMult = 1;
+var history = [];
+var deck = [];
+
+var RANKS = [
+  {name:'2', value:2}, {name:'3', value:3}, {name:'4', value:4},
+  {name:'5', value:5}, {name:'6', value:6}, {name:'7', value:7},
+  {name:'8', value:8}, {name:'9', value:9}, {name:'10', value:10},
+  {name:'J', value:11}, {name:'Q', value:12}, {name:'K', value:13},
+  {name:'A', value:14}
+];
+var SUITS = [
+  {symbol:'♠', color:'black'}, {symbol:'♥', color:'red'},
+  {symbol:'♦', color:'red'}, {symbol:'♣', color:'black'}
+];
+
+function $(i){return document.getElementById(i)}
+function fmt(n){
+  var r=Math.round(n*100)/100;
+  if(r%1===0)return Math.floor(r).toLocaleString('ru-RU');
+  return r.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+}
+
+// ==================== БАЛАНС ====================
+function loadBalance(){
+  var uid = localStorage.getItem(CURRENT_USER_KEY);
+  if(!uid){ window.location.replace('auth.html?need_auth=1'); return; }
+  firebase.database().ref('users/' + uid).once('value').then(function(snapshot){
+    var user = snapshot.val();
+    if(!user){
+      localStorage.removeItem(CURRENT_USER_KEY);
+      window.location.replace('auth.html?need_auth=1');
+      return;
+    }
+    B = (user.realBalance || 0) + (user.bonusBalance || 0);
+    $('bal').textContent = fmt(B);
+  });
+}
+
+function setBalDisplay(newTotal){
+  B = newTotal;
+  $('bal').textContent = fmt(B);
+}
+
+// ==================== SAFE CHANGE ====================
+async function safeChangeBalance(delta, type){
+  var uid = localStorage.getItem(CURRENT_USER_KEY);
+  if(!uid) return null;
+  var user = firebase.auth().currentUser;
+  if(!user) return null;
+
+  try{
+    var idToken = await user.getIdToken();
+    var resp = await fetch('/.netlify/functions/updateBalance', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + idToken },
+      body: JSON.stringify({ delta: delta, type: type || 'game' })
+    });
+    if(!resp.ok){
+      console.error('updateBalance error', resp.status, await resp.text());
+      return null;
+    }
+    var data = await resp.json();
+    return data.total;
+  }catch(e){
+    console.error('safeChangeBalance exception', e);
+    return null;
+  }
+}
+
+// ==================== ЗВУКИ ====================
+var AC=null;
+function getAC(){if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}}if(AC&&AC.state==='suspended')AC.resume();return AC}
+function sDeal(){var c=getAC();if(!c)return;var o=c.createOscillator();o.type='sine';o.frequency.setValueAtTime(400,c.currentTime);o.frequency.exponentialRampToValueAtTime(800,c.currentTime+.1);var g=c.createGain();g.gain.setValueAtTime(.06,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.15);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.17)}
+function sWin(){var c=getAC();if(!c)return;[523,659,784,1047].forEach(function(f,i){setTimeout(function(){var o=c.createOscillator();o.type='triangle';o.frequency.value=f;var g=c.createGain();g.gain.setValueAtTime(.18,c.currentTime);g.gain.exponentialRampToValueAtTime(.01,c.currentTime+.4);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.45)},i*90)})}
+function sLose(){var c=getAC();if(!c)return;var o=c.createOscillator();o.type='sine';o.frequency.setValueAtTime(300,c.currentTime);o.frequency.exponentialRampToValueAtTime(180,c.currentTime+.4);var g=c.createGain();g.gain.setValueAtTime(.1,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.5);var f=c.createBiquadFilter();f.type='lowpass';f.frequency.value=800;o.connect(f);f.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.55)}
+
+function buildDeck(){
+  deck=[];
+  for(var s=0;s<SUITS.length;s++){
+    for(var r=0;r<RANKS.length;r++){
+      deck.push({rank:RANKS[r], suit:SUITS[s]});
+    }
+  }
+  for(var i=deck.length-1;i>0;i--){
+    var j=Math.floor(Math.random()*(i+1));
+    var temp=deck[i];deck[i]=deck[j];deck[j]=temp;
+  }
+}
+
+function drawCard(){
+  if(deck.length===0) buildDeck();
+  return deck.pop();
+}
+
+function cardHTML(card, hidden){
+  if(hidden) return '?';
+  return '<div class="top">'+card.rank.name+'<br>'+card.suit.symbol+'</div>'+
+         '<div class="big">'+card.suit.symbol+'</div>'+
+         '<div class="bottom">'+card.rank.name+'<br>'+card.suit.symbol+'</div>';
+}
+
+function renderCard(el, card, hidden){
+  el.className = 'card-slot ' + (hidden ? 'back' : (card.suit.color === 'red' ? 'red' : 'black') + ' dealt');
+  if(hidden){
+    el.innerHTML = '?';
+  } else {
+    el.innerHTML = cardHTML(card, false);
+  }
+}
+
+function updateMultipliers(){
+  if(!currentCard) return;
+  var cardValue = currentCard.rank.value;
+  var lowerCount = 0, higherCount = 0;
+  for(var i=0;i<RANKS.length;i++){
+    if(RANKS[i].value < cardValue) lowerCount++;
+    if(RANKS[i].value > cardValue) higherCount++;
+  }
+  var totalCards = 52;
+  var lowerChance = (lowerCount * 4) / totalCards;
+  var higherChance = (higherCount * 4) / totalCards;
+
+  var multLow = lowerChance > 0 ? (0.97 / lowerChance) : 0;
+  var multHigh = higherChance > 0 ? (0.97 / higherChance) : 0;
+
+  $('multLow').textContent = '×' + (multLow > 0 ? multLow.toFixed(2) : '—');
+  $('multHigh').textContent = '×' + (multHigh > 0 ? multHigh.toFixed(2) : '—');
+
+  $('btnLow').disabled = multLow <= 0 || playing === false;
+  $('btnHigh').disabled = multHigh <= 0 || playing === false;
+}
+
+async function startRound(){
+  if(playing) return;
+  var bet = parseInt($('bet').value) || 0;
+  if(bet < 10){ alert('Мин. ставка 10₽'); return; }
+  if(bet > 10000){ alert('Макс. ставка 10 000₽'); return; }
+  if(bet > B){ alert('Мало денег'); return; }
+
+  // Списываем ставку через сервер
+  var newTotal = await safeChangeBalance(-bet, 'bet');
+  if(newTotal === null){ alert('❌ Ошибка списания ставки'); return; }
+  setBalDisplay(newTotal);
+
+  currentBet = bet;
+  currentMult = 1;
+  playing = true;
+
+  buildDeck();
+  currentCard = drawCard();
+
+  renderCard($('card1'), currentCard, false);
+  $('card2').className = 'card-slot back';
+  $('card2').innerHTML = '?';
+
+  $('resultMsg').className = 'result-msg';
+  $('resultMsg').textContent = 'Твоя карта: ' + currentCard.rank.name + ' ' + currentCard.suit.symbol + '. Выбери: больше или меньше?';
+
+  $('cashoutBtn').classList.remove('on');
+  $('cashoutBtn').disabled = true;
+
+  updateMultipliers();
+  sDeal();
+}
+
+async function makeChoice(choice){
+  if(!playing || !currentCard) return;
+  if(choice === 'high' && $('btnHigh').disabled) return;
+  if(choice === 'low' && $('btnLow').disabled) return;
+
+  var nextCard = drawCard();
+  renderCard($('card2'), nextCard, false);
+
+  var prevValue = currentCard.rank.value;
+  var nextValue = nextCard.rank.value;
+
+  // Пуш — возврат ставки
+  if(prevValue === nextValue){
+    $('resultMsg').className = 'result-msg';
+    $('resultMsg').innerHTML = '🤝 Пуш! Карты равны (' + prevValue + '). Ставка возвращается.';
+
+    var returned = await safeChangeBalance(currentBet, 'return');
+    if(returned !== null) setBalDisplay(returned);
+
+    playing = false;
+    $('btnHigh').disabled = true;
+    $('btnLow').disabled = true;
+    $('cashoutBtn').classList.remove('on');
+    history.unshift({win:false, push:true, value:nextValue});
+    if(history.length > 15) history.pop();
+    renderHistory();
+    return;
+  }
+
+  var won = false;
+  if(choice === 'high') won = nextValue > prevValue;
+  if(choice === 'low') won = nextValue < prevValue;
+
+  var chance;
+  if(choice === 'high'){
+    var higherCount = 0;
+    for(var i=0;i<RANKS.length;i++) if(RANKS[i].value > prevValue) higherCount++;
+    chance = (higherCount * 4) / 52;
+  } else {
+    var lowerCount = 0;
+    for(var i=0;i<RANKS.length;i++) if(RANKS[i].value < prevValue) lowerCount++;
+    chance = (lowerCount * 4) / 52;
+  }
+
+  var mult = 0.97 / chance;
+  currentMult = mult;
+
+  if(won){
+    var winAmount = Math.floor(currentBet * mult);
+    // Начисляем выигрыш через сервер
+    var newTotal = await safeChangeBalance(winAmount, 'win');
+    if(newTotal !== null) setBalDisplay(newTotal);
+
+    playing = false;
+    $('resultMsg').className = 'result-msg win';
+    $('resultMsg').innerHTML = '🎉 Победа! +₽' + fmt(winAmount) + '<div class="big">×' + mult.toFixed(2) + '</div>';
+    sWin();
+    showFloat('+₽' + fmt(winAmount), '#1dd1a1');
+    $('btnHigh').disabled = true;
+    $('btnLow').disabled = true;
+    $('cashoutBtn').classList.remove('on');
+  } else {
+    playing = false;
+    $('resultMsg').className = 'result-msg lose';
+    $('resultMsg').innerHTML = '😢 Проигрыш. Потеряно ₽' + fmt(currentBet);
+    sLose();
+    $('btnHigh').disabled = true;
+    $('btnLow').disabled = true;
+    $('cashoutBtn').classList.remove('on');
+  }
+
+  history.unshift({win:won, value:nextValue, mult:mult});
+  if(history.length > 15) history.pop();
+  renderHistory();
+}
+
+function showFloat(text, color){
+  var el = document.createElement('div');
+  el.className = 'float-text';
+  el.textContent = text;
+  el.style.color = color || '#ffd700';
+  el.style.left = '50%';
+  el.style.top = '50%';
+  el.style.transform = 'translateX(-50%)';
+  document.body.appendChild(el);
+  setTimeout(function(){ el.remove(); }, 2000);
+}
+
+function renderHistory(){
+  var el = $('historyList');
+  el.innerHTML = '';
+  for(var i=0;i<history.length;i++){
+    var h = history[i];
+    var d = document.createElement('div');
+    d.className = 'hist-item ' + (h.win ? 'win' : (h.push ? '' : 'lose'));
+    if(h.push) d.textContent = h.value + ' (пуш)';
+    else d.textContent = h.value;
+    el.appendChild(d);
+  }
+}
+
+// ==================== ОБРАБОТЧИКИ ====================
+$('btnHigh').onclick = function(){
+  if(!playing) { startRound(); return; }
+  makeChoice('high');
+};
+$('btnLow').onclick = function(){
+  if(!playing) { startRound(); return; }
+  makeChoice('low');
+};
+
+function setBet(v){ if(playing) return; $('bet').value = v; }
+
+// ==================== СТАРТ ====================
+$('card1').className = 'card-slot back';
+$('card1').innerHTML = '?';
+$('card2').className = 'card-slot back';
+$('card2').innerHTML = '?';
+
+$('btnHigh').disabled = true;
+$('btnLow').disabled = true;
+$('cashoutBtn').classList.remove('on');
+
+loadBalance();
+</script>
+</body>
+</html>

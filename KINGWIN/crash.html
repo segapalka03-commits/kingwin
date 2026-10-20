@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>🚀 CRASH — KINGWIN</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+body{
+  background: radial-gradient(ellipse at 50% 0%, #5a0f0f 0%, #2a0808 40%, #150505 70%, #0a0202 100%);
+  color:#fff; min-height:100vh; overflow:hidden; display:flex;
+}
+.sparkles {position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;overflow:hidden}
+.sparkles span{position:absolute;background:#ffd700;border-radius:50%;box-shadow:0 0 10px #ffd700,0 0 20px #b8860b;animation:fall linear infinite;opacity:0}
+@keyframes fall{0%{transform:translateY(-10vh) scale(0);opacity:0}10%{opacity:1;transform:translateY(0) scale(1)}90%{opacity:1}100%{transform:translateY(110vh) scale(0);opacity:0}}
+
+.sidebar{width:60px;background:rgba(21,16,42,0.9);border-right:1px solid rgba(212,175,55,0.2);display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:16px;z-index:10;backdrop-filter:blur(10px)}
+.sidebar .icon-btn{width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:center;font-size:1.2em;cursor:pointer;color:#8a86a8;transition:all .2s;text-decoration:none}
+.sidebar .icon-btn:hover{background:rgba(212,175,55,0.2);color:#ffd700}
+.sidebar .icon-btn.active{background:#d4af37;color:#0a0505;box-shadow:0 0 15px rgba(212,175,55,0.5)}
+
+.main{flex:1;display:flex;flex-direction:column;position:relative}
+.header{height:56px;background:rgba(21,16,42,0.9);border-bottom:1px solid rgba(212,175,55,0.2);display:flex;justify-content:space-between;align-items:center;padding:0 20px;position:relative;z-index:100;backdrop-filter:blur(10px)}
+.logo{font-size:1.2em;font-weight:900;letter-spacing:2px;display:flex;align-items:center;gap:8px;color:#ffd700;text-shadow:0 0 15px rgba(255,215,0,0.5)}
+.logo-icon{width:28px;height:28px;background:linear-gradient(135deg,#d4af37,#b8860b);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.9em;color:#0a0505}
+.bal-box{display:flex;align-items:center;gap:10px;padding:6px 16px;background:rgba(255,215,0,0.1);border:1px solid rgba(212,175,55,0.4);border-radius:10px}
+.bal-box .lbl{font-size:.6em;color:#d4af37;text-transform:uppercase;letter-spacing:1px}
+.bal-box .num{font-size:1em;font-weight:900;color:#ffd700;font-family:Arial}
+
+.crash-history-bar{position:absolute;top:70px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:50;pointer-events:none}
+.crash-hist-item{padding:4px 10px;border-radius:6px;font-size:0.8em;font-weight:900;font-family:Arial;background:rgba(0,0,0,.6);border:1.5px solid;animation:popIn 0.3s ease-out;backdrop-filter:blur(5px)}
+@keyframes popIn{0%{transform:scale(0.5);opacity:0}100%{transform:scale(1);opacity:1}}
+.crash-hist-item.red{color:#ff6b6b;border-color:#ff6b6b}
+.crash-hist-item.green{color:#1dd1a1;border-color:#1dd1a1}
+.crash-hist-item.purple{color:#c084fc;border-color:#c084fc}
+.crash-hist-item.gold{color:#ffd700;border-color:#ffd700}
+
+.game-area{flex:1;display:grid;grid-template-columns:280px 1fr 200px;gap:16px;padding:16px;overflow:hidden;position:relative}
+
+.bets-panel{background:rgba(0,0,0,0.3);border:1px solid rgba(212,175,55,0.2);border-radius:12px;display:flex;flex-direction:column;overflow:hidden;backdrop-filter:blur(5px)}
+.bets-header{display:flex;justify-content:space-between;padding:12px;border-bottom:1px solid rgba(212,175,55,0.2);font-size:.8em;color:#d4af37}
+.bets-list{flex:1;overflow-y:auto;padding:8px}
+.bet-row{display:flex;align-items:center;gap:8px;padding:8px;border-radius:8px;margin-bottom:4px;background:rgba(255,255,255,.03);font-size:.75em}
+.bet-row .avatar{width:24px;height:24px;border-radius:50%;background:#2a1a4a;display:flex;align-items:center;justify-content:center;font-size:.8em}
+.bet-row .info{flex:1;display:flex;flex-direction:column}
+.bet-row .name{color:#ccc;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:90px}
+.bet-row .amount{color:#ffd700;font-weight:900;font-family:Arial}
+.bet-row .mult{color:#1dd1a1;font-weight:900;font-family:Arial;margin-left:auto}
+.bet-row.me{background:rgba(212,175,55,.15);border:1px solid rgba(212,175,55,.3)}
+.bet-row.me .name{color:#ffd700}
+
+.chart-panel{background:rgba(0,0,0,0.4);border:1px solid rgba(212,175,55,0.2);border-radius:12px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(5px)}
+canvas{display:block;width:100%;height:100%;position:absolute;inset:0}
+.mult-text{position:relative;z-index:10;font-size:5em;font-weight:900;color:#fff;text-shadow:0 0 30px rgba(255,215,0,.8);font-family:Arial;transition:color .3s}
+.mult-text.crashed{color:#ff6b6b;text-shadow:0 0 30px rgba(255,107,107,.9)}
+
+.history-panel{background:rgba(0,0,0,0.3);border:1px solid rgba(212,175,55,0.2);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px;overflow-y:auto;max-height:100%;backdrop-filter:blur(5px)}
+.history-title{font-size:.75em;color:#d4af37;text-transform:uppercase;margin-bottom:4px;letter-spacing:1px}
+.hist-item{font-size:.8em;font-weight:900;font-family:Arial;padding:4px 8px;border-radius:6px;background:rgba(0,0,0,.4)}
+.hist-item.win{color:#1dd1a1;border-left:3px solid #1dd1a1}
+.hist-item.lose{color:#ff6b6b;border-left:3px solid #ff6b6b}
+
+.controls-panel{position:absolute;bottom:0;left:0;right:0;padding:16px;background:linear-gradient(0deg,#0a0202 60%,transparent);z-index:20;display:flex;justify-content:center;gap:16px}
+.control-box{background:rgba(26,21,48,0.95);border:1px solid rgba(212,175,55,0.4);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:10px;width:100%;max-width:600px;box-shadow:0 10px 30px rgba(0,0,0,.7);backdrop-filter:blur(10px)}
+.row{display:flex;gap:10px}
+.input-group{flex:1;background:rgba(0,0,0,0.5);border-radius:10px;padding:8px 12px;display:flex;align-items:center;gap:8px;border:1px solid rgba(212,175,55,0.3); overflow: hidden;}
+.input-group label{font-size:.65em;color:#d4af37;text-transform:uppercase;white-space:nowrap}
+.input-group input{flex:1;min-width: 0; background:transparent;border:none;color:#fff;font-weight:900;font-size:1em;outline:none;text-align:right;font-family:Arial;}
+.input-group input:focus{border-bottom:1px solid #d4af37}
+.input-group input[type=checkbox]{width:18px;height:18px;accent-color:#d4af37;cursor:pointer;flex:none}
+.quick-btns{display:flex;gap:6px;justify-content:center}
+.qbtn{flex:1;padding:6px;border-radius:6px;background:rgba(255,255,255,.05);border:none;color:#ccc;font-weight:700;cursor:pointer;font-size:.7em;transition:.2s}
+.qbtn:hover{background:rgba(212,175,55,.3);color:#fff}
+
+.btn-action{width: 100%; padding:18px; border-radius:12px; border:none; font-weight:900; font-size:1.2em; cursor:pointer; text-transform:uppercase; letter-spacing:2px; transition:all .15s; position: relative; overflow: hidden;}
+.btn-start-mode{background:linear-gradient(180deg,#ffd700,#b8860b);color:#0a0505;box-shadow:0 6px 0 #7a5a10, 0 0 20px rgba(255,215,0,.4);}
+.btn-start-mode:hover{transform:translateY(-2px);box-shadow:0 8px 0 #7a5a10, 0 0 30px rgba(255,215,0,.8);}
+.btn-start-mode:active{transform:translateY(4px);box-shadow:0 2px 0 #7a5a10;}
+
+.btn-cashout-mode{background:linear-gradient(180deg,#1dd1a1,#0a8a6a);color:#0a1a14;box-shadow:0 6px 0 #063d32, 0 0 20px rgba(29,209,161,.4); animation: cashPulse 1s infinite;}
+.btn-cashout-mode:hover{transform:translateY(-2px);box-shadow:0 8px 0 #063d32, 0 0 30px rgba(29,209,161,.8);}
+.btn-cashout-mode:active{transform:translateY(4px);box-shadow:0 2px 0 #063d32;}
+
+@keyframes cashPulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.2)}}
+
+.btn-disabled{background:linear-gradient(180deg,#333,#111);color:#666;box-shadow:none; cursor: not-allowed; transform: none !important; animation: none;}
+
+@media(max-width:900px){
+  .game-area{grid-template-columns:1fr;grid-template-rows:1fr auto}
+  .bets-panel{display:none}
+  .history-panel{position:absolute;right:8px;top:8px;width:120px;max-height:200px}
+  .mult-text{font-size:3.5em}
+  .crash-history-bar{top:60px;width:90%;justify-content:center;flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+
+<div class="sparkles" id="sparkles"></div>
+
+<div class="sidebar">
+  <a href="index.html" class="icon-btn" title="На главную">🏠</a>
+  <div class="icon-btn active" title="Crash">📈</div>
+  <a href="cases.html" class="icon-btn" title="Кейсы">📦</a>
+  <a href="dice.html" class="icon-btn" title="Dice">🎲</a>
+  <a href="slots.html" class="icon-btn" title="Слоты">🎰</a>
+</div>
+
+<div class="main">
+  <div class="header">
+    <div class="logo">
+      <div class="logo-icon">👑</div> KINGWIN
+    </div>
+    <div class="bal-box">
+      <div>
+        <div class="lbl">Баланс</div>
+        <div class="num">₽<span id="balVal">0</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="crash-history-bar" id="crashHistoryBar"></div>
+
+  <div class="game-area">
+    <div class="bets-panel">
+      <div class="bets-header"><span>Игроки</span><span>Ставка</span></div>
+      <div class="bets-list" id="betsList"></div>
+    </div>
+
+    <div class="chart-panel" id="chartPanel">
+      <canvas id="crashCanvas"></canvas>
+      <div class="mult-text" id="multText">1.00x</div>
+    </div>
+
+    <div class="history-panel" id="historyPanel">
+      <div class="history-title">История</div>
+    </div>
+  </div>
+
+  <div class="controls-panel">
+    <div class="control-box">
+      <div class="row">
+        <div class="input-group">
+          <label>Ставка</label>
+          <input type="number" id="betInput" value="100" min="10">
+        </div>
+        <div class="input-group">
+          <label>Авто-стоп</label>
+          <input type="checkbox" id="autoCheck">
+          <input type="number" id="autoInput" value="2.00" step="0.1" disabled style="width: 40px; flex: none;">
+        </div>
+      </div>
+      <div class="quick-btns">
+        <button class="qbtn" onclick="setBet(50)">50</button>
+        <button class="qbtn" onclick="setBet(100)">100</button>
+        <button class="qbtn" onclick="setBet(500)">500</button>
+        <button class="qbtn" onclick="setBet(1000)">1000</button>
+      </div>
+
+      <button class="btn-action btn-start-mode" id="actionBtn">🚀 СТАРТ</button>
+    </div>
+  </div>
+</div>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<script>
+var firebaseConfig = {
+  apiKey: "AIzaSyC8PI8bCzGB_tODO6MnOKAjkxXaASbA3vM",
+  authDomain: "kingwin-260a8.firebaseapp.com",
+  databaseURL: "https://kingwin-260a8-default-rtdb.firebaseio.com",
+  projectId: "kingwin-260a8",
+  storageBucket: "kingwin-260a8.firebasestorage.app",
+  messagingSenderId: "1085884746167",
+  appId: "1:1085884746167:web:9962cbc9eb5c876ae78032"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+var CURRENT_USER_KEY = 'kw_current_user';
+var B = 0;
+var state = 'idle';
+var cMult = 1.0;
+var cPoint = 1.0;
+var cBet = 100;
+var cLoop = null;
+var cPoints = [];
+var cCashed = false;
+var roundStartTime = 0;
+var canvas, ctx;
+var BOARD_W = 0, BOARD_H = 0;
+
+var BOT_NAMES = ['Макс', 'Лена', 'Дима', 'Оля', 'Кир', 'Аня', 'Витя', 'Стас'];
+var BOT_AVATARS = ['🐺', '🦊', '🐱', '🐯', '🦁', '🐸', '🐵', '🦉'];
+var currentBets = [];
+
+var crashHistory = [];
+try { crashHistory = JSON.parse(localStorage.getItem('kw_crash_hist') || '[]'); } catch(e){}
+
+function $(id){ return document.getElementById(id); }
+function fmt(n){
+  var r = Math.round(n*100)/100;
+  if(r%1===0) return Math.floor(r).toLocaleString('ru-RU');
+  return r.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+}
+
+// ==================== БАЛАНС ====================
+function loadBalance(){
+  var uid = localStorage.getItem(CURRENT_USER_KEY);
+  if(!uid){ window.location.replace('auth.html?need_auth=1'); return; }
+
+  firebase.database().ref('users/' + uid).once('value').then(function(snapshot){
+    var user = snapshot.val();
+    if(!user){
+      localStorage.removeItem(CURRENT_USER_KEY);
+      window.location.replace('auth.html?need_auth=1');
+      return;
+    }
+    B = (user.realBalance || 0) + (user.bonusBalance || 0);
+    $('balVal').textContent = fmt(B);
+  });
+}
+
+function setBalDisplay(newTotal){
+  B = newTotal;
+  $('balVal').textContent = fmt(B);
+}
+
+// ==================== SAFE CHANGE (через Netlify Function) ====================
+async function safeChangeBalance(delta, type){
+  var uid = localStorage.getItem(CURRENT_USER_KEY);
+  if(!uid) return null;
+
+  var user = firebase.auth().currentUser;
+  if(!user) return null;
+
+  try{
+    var idToken = await user.getIdToken();
+    var resp = await fetch('/.netlify/functions/updateBalance', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + idToken },
+      body: JSON.stringify({ delta: delta, type: type || 'game' })
+    });
+    if(!resp.ok){
+      console.error('updateBalance error', resp.status, await resp.text());
+      return null;
+    }
+    var data = await resp.json();
+    return data.total;
+  }catch(e){
+    console.error('safeChangeBalance exception', e);
+    return null;
+  }
+}
+
+// ==================== ИНИЦИАЛИЗАЦИЯ ====================
+function setBet(v){ if(state !== 'idle') return; $('betInput').value = v; }
+$('autoCheck').onchange = function(){ $('autoInput').disabled = !this.checked; };
+
+function init(){
+  canvas = $('crashCanvas');
+  resize();
+  window.addEventListener('resize', resize);
+  drawChart();
+  renderTopHistory();
+  updateBetsUI();
+  loadBalance();
+}
+
+function resize(){
+  var parent = $('chartPanel');
+  BOARD_W = parent.clientWidth;
+  BOARD_H = parent.clientHeight;
+  canvas.width = BOARD_W;
+  canvas.height = BOARD_H;
+  ctx = canvas.getContext('2d');
+  drawChart();
+}
+
+function drawChart(){
+  if(!ctx) return;
+  ctx.clearRect(0, 0, BOARD_W, BOARD_H);
+  ctx.strokeStyle = 'rgba(212,175,55,.08)';
+  ctx.lineWidth = 1;
+  for(var i=0; i<10; i++){
+    ctx.beginPath(); ctx.moveTo(0, BOARD_H/10 * i); ctx.lineTo(BOARD_W, BOARD_H/10 * i); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(BOARD_W/10 * i, 0); ctx.lineTo(BOARD_W/10 * i, BOARD_H); ctx.stroke();
+  }
+  if(cPoints.length < 2) return;
+  var maxMult = Math.max(cMult, 2);
+  var padX = 40, padY = 40;
+  var grad = ctx.createLinearGradient(0, 0, 0, BOARD_H);
+  if(cMult >= cPoint && cPoint > 1 && state === 'crashed'){
+    grad.addColorStop(0, 'rgba(255,107,107,0.3)');
+    grad.addColorStop(1, 'rgba(255,107,107,0)');
+  } else {
+    grad.addColorStop(0, 'rgba(255,215,0,0.3)');
+    grad.addColorStop(1, 'rgba(255,215,0,0)');
+  }
+  var lineColor = (cMult >= cPoint && cPoint > 1 && state === 'crashed') ? '#ff6b6b' : '#ffd700';
+  ctx.beginPath();
+  ctx.moveTo(padX, BOARD_H - padY);
+  for(var i=0; i<cPoints.length; i++){
+    var p = cPoints[i];
+    var x = padX + (p.t / 100) * (BOARD_W - padX*2);
+    var y = BOARD_H - padY - ((p.m - 1) / (maxMult - 1)) * (BOARD_H - padY*2);
+    ctx.lineTo(x, y);
+  }
+  var lastP = cPoints[cPoints.length-1];
+  var lastX = padX + (lastP.t / 100) * (BOARD_W - padX*2);
+  ctx.lineTo(lastX, BOARD_H - padY);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(padX, BOARD_H - padY);
+  for(var i=0; i<cPoints.length; i++){
+    var p = cPoints[i];
+    var x = padX + (p.t / 100) * (BOARD_W - padX*2);
+    var y = BOARD_H - padY - ((p.m - 1) / (maxMult - 1)) * (BOARD_H - padY*2);
+    ctx.lineTo(x, y);
+  }
+  ctx.strokeStyle = lineColor;
+  ctx.lineWidth = 4;
+  ctx.shadowColor = lineColor;
+  ctx.shadowBlur = 20;
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+  var p = cPoints[cPoints.length-1];
+  var rx = padX + (p.t / 100) * (BOARD_W - padX*2);
+  var ry = BOARD_H - padY - ((p.m - 1) / (maxMult - 1)) * (BOARD_H - padY*2);
+  ctx.beginPath();
+  ctx.arc(rx, ry, 6, 0, Math.PI*2);
+  ctx.fillStyle = lineColor;
+  ctx.fill();
+}
+
+function genCrash(){
+  var houseEdge = 0.03;
+  var e = 4294967296;
+  var h = Math.floor(Math.random() * e);
+  var crashPoint = (e / (h + 1)) * (1 - houseEdge);
+  if(crashPoint < 1.00) crashPoint = 1.00;
+  if(crashPoint > 100) crashPoint = 100; // ограничение сверху
+  return Math.round(crashPoint * 100) / 100;
+}
+
+function spawnBots(){
+  currentBets = [{ name:'Ты', avatar:'👑', amt:cBet, cashed:false, mult:0, me:true }];
+  var count = 3 + Math.floor(Math.random() * 5);
+  for(var i=0; i<count; i++){
+    currentBets.push({
+      name: BOT_NAMES[Math.floor(Math.random() * BOT_NAMES.length)],
+      avatar: BOT_AVATARS[Math.floor(Math.random() * BOT_AVATARS.length)],
+      amt: [50, 100, 200, 500, 1000][Math.floor(Math.random() * 5)],
+      cashed: false,
+      mult: 0,
+      auto: (1.5 + Math.random() * 5).toFixed(2),
+      me: false
+    });
+  }
+  updateBetsUI();
+}
+
+function updateBetsUI(){
+  var el = $('betsList');
+  el.innerHTML = '';
+  for(var i=0; i<currentBets.length; i++){
+    var b = currentBets[i];
+    var div = document.createElement('div');
+    div.className = 'bet-row' + (b.me ? ' me' : '');
+    var info = '';
+    if(b.cashed){
+      info = '<div class="mult">×' + b.mult.toFixed(2) + '</div>';
+    } else {
+      info = '<div style="color:#666;font-size:.7em">в игре</div>';
+    }
+    div.innerHTML =
+      '<div class="avatar">' + b.avatar + '</div>' +
+      '<div class="info"><div class="name">' + b.name + '</div><div class="amount">₽' + fmt(b.amt) + '</div></div>' +
+      info;
+    el.appendChild(div);
+  }
+}
+
+function getHistoryColorClass(mult) {
+  if (mult < 1.5) return 'red';
+  if (mult < 4.0) return 'green';
+  if (mult < 10.0) return 'purple';
+  return 'gold';
+}
+
+function addTopHistory(mult){
+  crashHistory.unshift(mult);
+  if(crashHistory.length > 10) crashHistory.pop();
+  localStorage.setItem('kw_crash_hist', JSON.stringify(crashHistory));
+  renderTopHistory();
+}
+
+function renderTopHistory(){
+  var el = $('crashHistoryBar');
+  el.innerHTML = '';
+  for(var i=0; i<crashHistory.length; i++){
+    var m = crashHistory[i];
+    var div = document.createElement('div');
+    div.className = 'crash-hist-item ' + getHistoryColorClass(m);
+    div.textContent = m.toFixed(2) + 'x';
+    el.appendChild(div);
+  }
+}
+
+// ==================== ИГРА ====================
+$('actionBtn').onclick = function(){
+  if(state === 'idle'){ startCountdown(); }
+  else if(state === 'playing'){ cashOut(); }
+};
+
+async function startCountdown(){
+  if(state !== 'idle') return;
+  var bet = parseInt($('betInput').value) || 0;
+  if(bet < 10){ alert('Мин. ставка 10₽'); return; }
+  if(bet > B){ alert('Мало денег'); return; }
+
+  // Списываем ставку через сервер
+  var newTotal = await safeChangeBalance(-bet, 'bet');
+  if(newTotal === null){
+    alert('❌ Ошибка списания ставки. Попробуй ещё раз.');
+    return;
+  }
+  setBalDisplay(newTotal);
+  cBet = bet;
+  state = 'countdown';
+
+  var btn = $('actionBtn');
+  btn.className = 'btn-action btn-disabled';
+  btn.disabled = true;
+  btn.textContent = '⏱ 5...';
+
+  sCountdownTick();
+
+  var count = 5;
+  var countInterval = setInterval(function(){
+    count--;
+    if(count > 0){
+      btn.textContent = '⏱ ' + count + '...';
+      sCountdownTick();
+    } else {
+      clearInterval(countInterval);
+      startRound();
+    }
+  }, 1000);
+}
+
+function startRound(){
+  state = 'playing';
+  cCashed = false;
+  cMult = 1.0;
+  cPoints = [];
+  cPoint = genCrash();
+  roundStartTime = Date.now();
+
+  $('multText').className = 'mult-text';
+  $('multText').textContent = '1.00x';
+
+  var btn = $('actionBtn');
+  btn.disabled = false;
+  btn.className = 'btn-action btn-cashout-mode';
+  btn.textContent = '💰 ЗАБРАТЬ ₽' + fmt(cBet);
+
+  spawnBots();
+  sStart();
+  crashRun();
+}
+
+function crashRun(){
+  if(state !== 'playing') return;
+  var elapsed = (Date.now() - roundStartTime) / 1000;
+  cMult = 1 + Math.pow(elapsed, 1.6) * 0.08 + elapsed * 0.05;
+
+  if(cMult >= cPoint){
+    cMult = cPoint;
+    crash();
+    return;
+  }
+
+  $('multText').textContent = cMult.toFixed(2) + 'x';
+
+  var btn = $('actionBtn');
+  if(!cCashed){
+    btn.textContent = '💰 ЗАБРАТЬ ₽' + fmt(Math.floor(cBet * cMult));
+  }
+
+  var autoEnabled = $('autoCheck').checked;
+  var auto = parseFloat($('autoInput').value) || 0;
+  if(!cCashed && autoEnabled && auto > 1.01 && cMult >= auto){
+    cashOut();
+  }
+
+  for(var i=0; i<currentBets.length; i++){
+    var b = currentBets[i];
+    if(!b.cashed && !b.me && b.auto && cMult >= parseFloat(b.auto)){
+      b.cashed = true;
+      b.mult = cMult;
+    }
+  }
+
+  var t = Math.min(100, (cPoints.length + 1) * 0.5);
+  cPoints.push({t: t, m: cMult});
+  if(cPoints.length > 200) cPoints.shift();
+  drawChart();
+  cLoop = setTimeout(crashRun, 30);
+}
+
+function crash(){
+  state = 'crashed';
+  clearTimeout(cLoop);
+  $('multText').className = 'mult-text crashed';
+  $('multText').textContent = cMult.toFixed(2) + 'x';
+  drawChart();
+  sCrash();
+  updateBetsUI();
+  addTopHistory(cMult);
+
+  var btn = $('actionBtn');
+  btn.disabled = true;
+  btn.className = 'btn-action btn-disabled';
+
+  if(!cCashed){
+    btn.textContent = '💥 КРАШ';
+    addHistoryItem(false, cMult);
+  } else {
+    btn.textContent = '✅ ВЫ ЗАБРАЛИ';
+  }
+
+  setTimeout(function(){
+    state = 'idle';
+    $('multText').className = 'mult-text';
+    $('multText').textContent = '1.00x';
+
+    btn.disabled = false;
+    btn.className = 'btn-action btn-start-mode';
+    btn.textContent = '🚀 СТАРТ';
+  }, 3000);
+}
+
+async function cashOut(){
+  if(state !== 'playing' || cCashed) return;
+  cCashed = true;
+
+  var win = Math.floor(cBet * cMult);
+  var newTotal = await safeChangeBalance(win, 'win');
+  if(newTotal !== null) setBalDisplay(newTotal);
+
+  var btn = $('actionBtn');
+  btn.disabled = true;
+  btn.className = 'btn-action btn-disabled';
+  btn.textContent = '✅ ЗАБРАНО ₽' + fmt(win);
+
+  for(var i=0; i<currentBets.length; i++){
+    if(currentBets[i].me){
+      currentBets[i].cashed = true;
+      currentBets[i].mult = cMult;
+    }
+  }
+  updateBetsUI();
+  sCash();
+  addHistoryItem(true, cMult, win);
+}
+
+function addHistoryItem(win, mult, amount){
+  var el = $('historyPanel');
+  var div = document.createElement('div');
+  div.className = 'hist-item ' + (win ? 'win' : 'lose');
+  div.textContent = (win ? '+' : '−') + '×' + mult.toFixed(2) + (amount ? ' (₽' + fmt(amount) + ')' : '');
+  el.appendChild(div);
+  if(el.children.length > 15) el.removeChild(el.children[1]);
+}
+
+// ==================== ЗВУКИ ====================
+var AC = null;
+function getAC(){ try{ if(!AC) AC = new (window.AudioContext||window.webkitAudioContext)(); if(AC.state === 'suspended') AC.resume(); return AC; }catch(e){ return null; } }
+
+function sCountdownTick(){
+  try{
+    var c = getAC(); if(!c) return;
+    var o = c.createOscillator();
+    o.type = 'square';
+    o.frequency.setValueAtTime(800, c.currentTime);
+    var g = c.createGain();
+    g.gain.setValueAtTime(0.05, c.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.1);
+    o.connect(g); g.connect(c.destination);
+    o.start(); o.stop(c.currentTime + 0.15);
+  }catch(e){}
+}
+function sStart(){
+  try{
+    var c = getAC(); if(!c) return;
+    var t = c.currentTime;
+    var o1 = c.createOscillator();
+    o1.type = 'triangle';
+    o1.frequency.setValueAtTime(200, t);
+    o1.frequency.exponentialRampToValueAtTime(440, t + 1.5);
+    var g = c.createGain();
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(0.06, t + 0.2);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 2.0);
+    o1.connect(g); g.connect(c.destination);
+    o1.start(t); o1.stop(t + 2.1);
+  }catch(e){}
+}
+function sCrash(){
+  try{
+    var c = getAC(); if(!c) return;
+    var t = c.currentTime;
+    var o = c.createOscillator();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(200, t);
+    o.frequency.exponentialRampToValueAtTime(40, t + 1.2);
+    var g = c.createGain();
+    g.gain.setValueAtTime(0.2, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 1.5);
+    o.connect(g); g.connect(c.destination);
+    o.start(t); o.stop(t + 1.6);
+  }catch(e){}
+}
+function sCash(){
+  try{
+    var c = getAC(); if(!c) return;
+    [523, 659, 784, 1047].forEach(function(freq, i){
+      setTimeout(function(){
+        try{
+          var o = c.createOscillator();
+          o.type = 'sine';
+          o.frequency.value = freq;
+          var g = c.createGain();
+          g.gain.setValueAtTime(0.1, c.currentTime);
+          g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.6);
+          o.connect(g); g.connect(c.destination);
+          o.start(); o.stop(c.currentTime + 0.65);
+        }catch(e){}
+      }, i * 100);
+    });
+  }catch(e){}
+}
+
+// Искры
+(function(){
+  var d = document.getElementById('sparkles');
+  for(var i=0;i<40;i++){
+    var s = document.createElement('span');
+    s.style.left = Math.random()*100+'vw';
+    var size = Math.random()*4+2;
+    s.style.width = size+'px';
+    s.style.height = size+'px';
+    s.style.animationDelay = (Math.random()*10)+'s';
+    s.style.animationDuration = (Math.random()*5+5)+'s';
+    s.style.opacity = Math.random()*.8+.2;
+    d.appendChild(s);
+  }
+})();
+
+init();
+</script>
+</body>
+</html>

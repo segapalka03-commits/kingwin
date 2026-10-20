@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>⚙ АДМИН-ПАНЕЛЬ — KINGWIN</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Georgia,serif}
+body{background: radial-gradient(ellipse at 50% 0%, #5a0f0f 0%, #2a0808 40%, #150505 70%, #0a0202 100%);color:#fff;min-height:100vh;padding:20px;display:flex;justify-content:center;align-items:center}
+.c{width:100%;max-width:900px;margin:0 auto}
+.admin-box{background:linear-gradient(180deg,rgba(42,8,8,.98),rgba(10,2,2,.98));border:3px solid #d4af37;border-radius:20px;padding:30px;box-shadow:0 0 60px rgba(212,175,55,.5);position:relative}
+.admin-box::before{content:'👑';position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:2.2em;filter:drop-shadow(0 0 15px #ffd700)}
+h1{text-align:center;font-size:1.6em;font-weight:900;letter-spacing:4px;background:linear-gradient(180deg,#fff8d0,#ffd700 40%,#b8860b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px}
+.subtitle{text-align:center;color:#d4af37;font-size:.7em;letter-spacing:3px;margin-bottom:24px;text-transform:uppercase;opacity:.85}
+
+.pass-area{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+.pass-input{width:100%;padding:14px 18px;border-radius:12px;background:rgba(0,0,0,.6);border:2px solid #d4af37;color:#ffd700;font-size:1em;font-family:Arial;letter-spacing:2px;text-align:center;outline:none;transition:all .3s}
+.pass-input:focus{border-color:#ffd700;box-shadow:0 0 20px rgba(255,215,0,.5)}
+.btn-login{padding:14px;border-radius:12px;border:3px solid #ffd700;background:linear-gradient(180deg,#ffd700,#b8860b);color:#0a0505;font-family:Georgia;font-weight:900;font-size:1em;letter-spacing:2px;cursor:pointer;text-transform:uppercase;transition:all .15s;box-shadow:0 4px 0 #7a5a10}
+.btn-login:hover{transform:translateY(-2px);box-shadow:0 6px 0 #7a5a10,0 0 30px rgba(255,215,0,.8)}
+.btn-login:active{transform:translateY(2px);box-shadow:0 2px 0 #7a5a10}
+
+.panel{display:none}
+.panel.on{display:block}
+
+.admin-tabs{display:flex;gap:10px;margin-bottom:20px;border-bottom:1px solid rgba(212,175,55,.3);padding-bottom:10px;flex-wrap:wrap;}
+.admin-tab{padding:8px 16px;border-radius:8px;background:transparent;border:1px solid transparent;color:#aaa;font-weight:700;cursor:pointer;transition:all .2s;font-family:Georgia;font-size:0.9em;}
+.admin-tab.active{background:rgba(212,175,55,.2);color:#ffd700;border-color:#d4af37;}
+
+.section-title{color:#ffd700;font-size:.9em;letter-spacing:3px;text-transform:uppercase;margin:24px 0 12px;padding-bottom:6px;border-bottom:1px solid rgba(212,175,55,.3)}
+
+.deposit-row{display:flex;justify-content:space-between;align-items:center;padding:14px;margin-bottom:10px;background:rgba(0,0,0,.4);border:1px solid rgba(212,175,55,.3);border-radius:10px;flex-wrap:wrap;gap:10px}
+.deposit-row.pending{border-color:#ffd700;background:rgba(255,215,0,.05)}
+.deposit-info{display:flex;flex-direction:column;gap:4px;flex:1;min-width:200px}
+.deposit-info .name{font-weight:900;color:#ffd700;font-size:.95em}
+.deposit-info .meta{font-size:.75em;color:#aaa}
+.deposit-info .amount{font-size:1.1em;font-weight:900;color:#1dd1a1;font-family:Arial;margin-top:4px}
+
+.btn-confirm{padding:10px 20px;border-radius:8px;border:2px solid #1dd1a1;background:linear-gradient(180deg,#1dd1a1,#0a8a6a);color:#0a1a14;font-weight:900;font-size:.85em;cursor:pointer;box-shadow:0 3px 0 #063d32}
+.btn-confirm:hover{transform:translateY(-2px);box-shadow:0 5px 0 #063d32}
+.btn-confirm:active{transform:translateY(2px);box-shadow:none}
+.btn-reject{padding:10px 20px;border-radius:8px;border:2px solid #ff6b6b;background:rgba(0,0,0,0.5);color:#ff6b6b;font-weight:900;font-size:.85em;cursor:pointer}
+.btn-reject:hover{background:rgba(255,107,107,0.2)}
+
+.users-list{max-height:300px;overflow-y:auto;padding-right:6px}
+.user-row{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;margin-bottom:10px;background:rgba(0,0,0,.4);border:1px solid rgba(212,175,55,.3);border-radius:10px;flex-wrap:wrap;gap:10px}
+.user-info{display:flex;flex-direction:column;gap:2px;min-width:180px;flex:1}
+.user-info .nick{font-weight:900;color:#ffd700;font-size:.95em}
+.user-info .email{font-size:.75em;color:#aaa}
+.user-info .stats{font-size:.7em;color:#1dd1a1;margin-top:2px}
+.user-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.user-actions input{width:70px;padding:6px 8px;background:#0a0202;border:2px solid #d4af37;border-radius:6px;color:#ffd700;text-align:center;font-weight:700;font-family:Arial;outline:none}
+
+.btn-give-user,.btn-take-user,.btn-delete-user{padding:6px 10px;border-radius:6px;border:none;font-weight:900;font-size:.8em;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.btn-give-user{background:linear-gradient(180deg,#1dd1a1,#0a8a6a);color:#0a1a14;}
+.btn-take-user{background:linear-gradient(180deg,#feca57,#b8860b);color:#0a0505;}
+.btn-delete-user{background:linear-gradient(180deg,#ff6b6b,#a93226);color:#fff;}
+
+.btn-reset{width:100%;padding:12px;border-radius:10px;border:2px solid #ff6b6b;background:linear-gradient(180deg,#3a0a0a,#1a0505);color:#ff6b6b;font-weight:700;font-size:.9em;cursor:pointer;letter-spacing:1px;transition:all .15s;margin-bottom:10px}
+.btn-reset:hover{box-shadow:0 0 20px rgba(255,107,107,.5)}
+.btn-close{width:100%;padding:12px;margin-top:16px;border-radius:10px;border:2px solid #d4af37;background:linear-gradient(180deg,#2a0808,#1a0505);color:#d4af37;font-weight:700;font-size:.9em;cursor:pointer;letter-spacing:1px}
+
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:12px 24px;border-radius:12px;background:linear-gradient(180deg,#1dd1a1,#0a8a6a);color:#0a1a14;font-weight:900;letter-spacing:1px;box-shadow:0 0 30px rgba(29,209,161,.7);z-index:9999;opacity:0;transition:opacity .3s}
+.toast.on{opacity:1}
+.toast.error{background:linear-gradient(180deg,#ff6b6b,#a93226);color:#fff}
+
+.back{display:inline-block;padding:10px 22px;border-radius:12px;background:linear-gradient(180deg,#2a0808,#1a0505);border:2px solid #d4af37;color:#ffd700;text-decoration:none;font-size:.85em;font-weight:700;letter-spacing:2px;margin-bottom:16px}
+</style>
+</head>
+<body>
+
+<div class="c">
+  <a href="index.html" class="back">← НА ГЛАВНУЮ</a>
+
+  <div class="admin-box">
+    <h1>⚙ АДМИН-ПАНЕЛЬ</h1>
+    <div class="subtitle">KINGWIN · ВХОД ТОЛЬКО ДЛЯ СВОИХ</div>
+
+    <div class="pass-area" id="loginArea">
+      <input type="password" id="passInput" class="pass-input" placeholder="Введите пароль..." autocomplete="off">
+      <button class="btn-login" onclick="login()">🔓 ВОЙТИ</button>
+    </div>
+
+    <div class="panel" id="adminPanel">
+      
+      <div class="admin-tabs">
+        <button class="admin-tab active" onclick="switchAdminTab('deposits')" id="atab-deposits">💳 Депозиты</button>
+        <button class="admin-tab" onclick="switchAdminTab('withdraws')" id="atab-withdraws">💸 Выводы</button>
+        <button class="admin-tab" onclick="switchAdminTab('users')" id="atab-users">👥 Игроки</button>
+      </div>
+
+      <div id="sec-deposits">
+        <div class="section-title">Заявки на пополнение</div>
+        <div id="depositsList"></div>
+      </div>
+
+      <div id="sec-withdraws" style="display:none;">
+        <div class="section-title">Заявки на вывод</div>
+        <div id="withdrawsList"></div>
+      </div>
+
+      <div id="sec-users" style="display:none;">
+        <div class="section-title">Управление аккаунтами</div>
+        <div class="users-list" id="usersList"></div>
+        <div class="section-title">Опасная зона</div>
+        <button class="btn-reset" onclick="clearAllUsers()">🗑 УДАЛИТЬ ВСЕХ ПОЛЬЗОВАТЕЛЕЙ</button>
+      </div>
+
+      <button class="btn-close" onclick="logout()">🚪 ВЫЙТИ</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ================= FIREBASE ================= -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<script>
+var firebaseConfig = {
+  apiKey: "AIzaSyC8PI8bCzGB_tODO6MnOKAjkxXaASbA3vM",
+  authDomain: "kingwin-260a8.firebaseapp.com",
+  databaseURL: "https://kingwin-260a8-default-rtdb.firebaseio.com",
+  projectId: "kingwin-260a8",
+  storageBucket: "kingwin-260a8.firebasestorage.app",
+  messagingSenderId: "1085884746167",
+  appId: "1:1085884746167:web:9962cbc9eb5c876ae78032"
+};
+
+firebase.initializeApp(firebaseConfig);
+var db = firebase.database();
+
+var ADMIN_PASS = 'king2025';
+var ADMIN_AUTH_KEY = 'kw_admin_auth';
+
+function $(id){ return document.getElementById(id); }
+function fmt(n){ var r = Math.round(n*100)/100; if(r%1===0) return Math.floor(r).toLocaleString('ru-RU'); return r.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,' '); }
+
+// ✅ Функция для безопасных ключей (как в auth.html)
+function safeKey(email) {
+  return email.replace(/\./g, '_dot_')
+              .replace(/#/g, '_hash_')
+              .replace(/\$/g, '_dollar_')
+              .replace(/\[/g, '_lb_')
+              .replace(/\]/g, '_rb_');
+}
+
+function showToast(text, isError){
+  var t = $('toast');
+  t.textContent = text;
+  t.className = 'toast' + (isError ? ' error' : '') + ' on';
+  setTimeout(function(){ t.classList.remove('on'); }, 2500);
+}
+
+window.onload = function() {
+  if(localStorage.getItem(ADMIN_AUTH_KEY) === 'true') { openAdmin(); }
+};
+
+function login(){
+  var pass = $('passInput').value.trim();
+  if(pass === ADMIN_PASS){
+    localStorage.setItem(ADMIN_AUTH_KEY, 'true');
+    openAdmin();
+    showToast('✅ Доступ разрешён');
+  } else {
+    showToast('❌ Неверный пароль', true);
+    $('passInput').value = '';
+  }
+}
+
+function openAdmin() {
+  $('loginArea').style.display = 'none';
+  $('adminPanel').classList.add('on');
+  renderDeposits();
+  renderWithdraws();
+  renderUsers();
+}
+
+function logout(){
+  localStorage.removeItem(ADMIN_AUTH_KEY);
+  $('passInput').value = '';
+  $('loginArea').style.display = 'flex';
+  $('adminPanel').classList.remove('on');
+  showToast('🚪 Вы вышли');
+}
+
+function switchAdminTab(tab){
+  document.querySelectorAll('.admin-tab').forEach(function(b){ b.classList.remove('active'); });
+  $('atab-' + tab).classList.add('active');
+  $('sec-deposits').style.display = tab === 'deposits' ? 'block' : 'none';
+  $('sec-withdraws').style.display = tab === 'withdraws' ? 'block' : 'none';
+  $('sec-users').style.display = tab === 'users' ? 'block' : 'none';
+}
+
+// ==================== ДЕПОЗИТЫ ====================
+function renderDeposits(){
+  var list = $('depositsList');
+  list.innerHTML = '<div style="color:#8a6a10;text-align:center;padding:20px;">Загрузка...</div>';
+  
+  db.ref('pending_deposits').once('value').then(function(snapshot){
+    var data = snapshot.val() || {};
+    var arr = [];
+    for (var key in data) { var req = data[key]; req.firebaseKey = key; arr.push(req); }
+    
+    var active = arr.filter(function(r){ return r.status === 'pending'; });
+    list.innerHTML = '';
+    if(active.length === 0){
+      list.innerHTML = '<div style="color:#8a6a10;text-align:center;padding:20px;font-style:italic;">Нет активных заявок</div>';
+      return;
+    }
+    active.forEach(function(req){
+      var div = document.createElement('div');
+      div.className = 'deposit-row pending';
+      var d = new Date(req.date);
+      var timeStr = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+      div.innerHTML = `
+        <div class="deposit-info">
+          <div class="name">${req.nick} (${req.email})</div>
+          <div class="meta">Заявка от ${timeStr} · ${req.method || 'Ozon Банк'}</div>
+          <div class="amount">К оплате: ₽${fmt(req.amount)} → <span style="color:#ffd700;">К зачислению: ₽${fmt(req.total)}</span></div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-confirm" onclick="confirmDeposit('${req.firebaseKey}')">✅ ЗАЧИСЛИТЬ</button>
+          <button class="btn-reject" onclick="rejectDeposit('${req.firebaseKey}')">❌ ОТКЛОНИТЬ</button>
+        </div>
+      `;
+      list.appendChild(div);
+    });
+  });
+}
+
+function confirmDeposit(key){
+  db.ref('pending_deposits/' + key).once('value').then(function(snapshot){
+    var req = snapshot.val();
+    if(!req || req.status !== 'pending') return;
+    
+    var safeEmailKey = safeKey(req.email);
+    
+    db.ref('users/' + safeEmailKey).once('value').then(function(userSnap){
+      var user = userSnap.val();
+      if(!user){ showToast('❌ Пользователь не найден', true); return; }
+      
+      var realCredit = req.amount;
+      var bonusCredit = req.bonus ? req.amount : 0;
+      
+      user.realBalance = (user.realBalance || 0) + realCredit;
+      if(bonusCredit > 0){
+        user.bonusBalance = (user.bonusBalance || 0) + bonusCredit;
+        var wager = bonusCredit * 15;
+        user.bonusWager = (user.bonusWager || 0) + wager;
+        user.bonusWagerTotal = (user.bonusWagerTotal || 0) + wager;
+      }
+      
+      db.ref('users/' + safeEmailKey).set(user).then(function(){
+        db.ref('pending_deposits/' + key).update({ status: 'confirmed' }).then(function(){
+          showToast('✅ Зачислено игроку ' + user.nick);
+          renderDeposits();
+          renderUsers();
+        });
+      });
+    });
+  });
+}
+
+function rejectDeposit(key){
+  if(!confirm('Отклонить эту заявку?')) return;
+  db.ref('pending_deposits/' + key).update({ status: 'rejected' }).then(function(){
+    showToast('❌ Заявка отклонена');
+    renderDeposits();
+  });
+}
+
+// ==================== ВЫВОДЫ ====================
+function renderWithdraws(){
+  var list = $('withdrawsList');
+  list.innerHTML = '<div style="color:#8a6a10;text-align:center;padding:20px;">Загрузка...</div>';
+  
+  db.ref('withdraw_requests').once('value').then(function(snapshot){
+    var data = snapshot.val() || {};
+    var arr = [];
+    for (var key in data) { var req = data[key]; req.firebaseKey = key; arr.push(req); }
+    
+    var active = arr.filter(function(r){ return r.status === 'pending'; });
+    list.innerHTML = '';
+    if(active.length === 0){
+      list.innerHTML = '<div style="color:#8a6a10;text-align:center;padding:20px;font-style:italic;">Нет активных заявок на вывод</div>';
+      return;
+    }
+    active.forEach(function(req){
+      var div = document.createElement('div');
+      div.className = 'deposit-row pending';
+      div.innerHTML = `
+        <div class="deposit-info">
+          <div class="name">${req.nick} (${req.email})</div>
+          <div class="amount" style="color:#ff6b6b;">Вывести: ₽${fmt(req.amount)}</div>
+          <div class="meta" style="color:#fff; margin-top:4px;">🏦 ${req.bank} · 💳 ${req.card}</div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-confirm" onclick="confirmWithdraw('${req.firebaseKey}')">✅ ОТПРАВИТЬ</button>
+          <button class="btn-reject" onclick="rejectWithdraw('${req.firebaseKey}')">❌ ОТКЛОНИТЬ</button>
+        </div>
+      `;
+      list.appendChild(div);
+    });
+  });
+}
+
+function confirmWithdraw(key){
+  db.ref('withdraw_requests/' + key).update({ status: 'confirmed' }).then(function(){
+    showToast('✅ Вывод подтверждён');
+    renderWithdraws();
+  });
+}
+
+function rejectWithdraw(key){
+  db.ref('withdraw_requests/' + key).once('value').then(function(snapshot){
+    var req = snapshot.val();
+    if(!req) return;
+    
+    var safeEmailKey = safeKey(req.email);
+    
+    db.ref('users/' + safeEmailKey).once('value').then(function(userSnap){
+      var user = userSnap.val();
+      if(!user) return;
+      user.realBalance = (user.realBalance || 0) + req.amount;
+      db.ref('users/' + safeEmailKey).set(user).then(function(){
+        db.ref('withdraw_requests/' + key).update({ status: 'rejected' }).then(function(){
+          showToast('❌ Вывод отклонён, деньги возвращены');
+          renderWithdraws();
+          renderUsers();
+        });
+      });
+    });
+  });
+}
+
+// ==================== ПОЛЬЗОВАТЕЛИ ====================
+function renderUsers(){
+  var list = $('usersList');
+  list.innerHTML = '<div style="color:#8a6a10;text-align:center;padding:20px;">Загрузка...</div>';
+  
+  db.ref('users').once('value').then(function(snapshot){
+    var users = snapshot.val() || {};
+    list.innerHTML = '';
+    var keys = Object.keys(users);
+    if(keys.length === 0){
+      list.innerHTML = '<div style="color:#8a6a10;text-align:center;padding:20px;font-style:italic;">Пока нет пользователей</div>';
+      return;
+    }
+    keys.forEach(function(key){
+      var user = users[key];
+      var div = document.createElement('div');
+      div.className = 'user-row';
+      div.innerHTML = `
+        <div class="user-info">
+          <div class="nick">${user.avatar || '👑'} ${user.nick}</div>
+          <div class="email">${user.email}</div>
+          <div class="stats">Реал: ₽${fmt(user.realBalance || 0)} · Бонус: ₽${fmt(user.bonusBalance || 0)}</div>
+        </div>
+        <div class="user-actions">
+          <input type="number" id="amt-${key}" value="1000" min="1" step="100">
+          <button class="btn-give-user" title="Выдать" onclick="giveMoneyToUser('${key}')">➕</button>
+          <button class="btn-take-user" title="Забрать" onclick="takeMoneyFromUser('${key}')">➖</button>
+          <button class="btn-delete-user" title="Удалить" onclick="deleteUser('${key}')">🗑</button>
+        </div>
+      `;
+      list.appendChild(div);
+    });
+  });
+}
+
+function giveMoneyToUser(key){
+  var input = document.getElementById('amt-' + key);
+  var amt = parseInt(input.value) || 0;
+  if(amt < 1) return;
+  
+  db.ref('users/' + key).once('value').then(function(snapshot){
+    var user = snapshot.val();
+    if(!user) return;
+    user.realBalance = (user.realBalance || 0) + amt;
+    db.ref('users/' + key).set(user).then(function(){
+      showToast('✅ Выдано ₽' + fmt(amt) + ' игроку ' + user.nick);
+      renderUsers();
+    });
+  });
+}
+
+function takeMoneyFromUser(key){
+  var input = document.getElementById('amt-' + key);
+  var amt = parseInt(input.value) || 0;
+  if(amt < 1) return;
+  
+  db.ref('users/' + key).once('value').then(function(snapshot){
+    var user = snapshot.val();
+    if(!user) return;
+    var currentBal = user.realBalance || 0;
+    if(currentBal < amt) amt = currentBal;
+    if(amt <= 0) return;
+    user.realBalance = currentBal - amt;
+    db.ref('users/' + key).set(user).then(function(){
+      showToast('✅ Забрано ₽' + fmt(amt) + ' у ' + user.nick);
+      renderUsers();
+    });
+  });
+}
+
+function deleteUser(key){
+  if(!confirm('Удалить этот аккаунт?')) return;
+  db.ref('users/' + key).remove().then(function(){
+    showToast('✅ Аккаунт удалён');
+    renderUsers();
+  });
+}
+
+function clearAllUsers(){
+  if(!confirm('Удалить ВСЕХ пользователей?')) return;
+  db.ref('users').remove().then(function(){
+    showToast('✅ Все пользователи удалены');
+    renderUsers();
+  });
+}
+
+$('passInput').addEventListener('keydown', function(e){
+  if(e.key === 'Enter') login();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>🎁 БОНУСЫ — KINGWIN</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Georgia,serif}
+body{background: radial-gradient(ellipse at 50% 0%, #5a0f0f 0%, #2a0808 40%, #150505 70%, #0a0202 100%); color:#fff;min-height:100vh;padding:20px;display:flex;justify-content:center;align-items:center}
+.c{width:100%;max-width:600px;margin:0 auto}
+
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;gap:12px;flex-wrap:wrap;position:absolute;top:20px;left:20px;right:20px;}
+.back{padding:10px 22px;border-radius:12px;background:linear-gradient(180deg,#2a0808,#1a0505);border:2px solid #d4af37;color:#ffd700;text-decoration:none;font-size:.85em;font-weight:700;letter-spacing:2px;transition:all .3s}
+.back:hover{transform:translateX(-4px);box-shadow:0 0 25px rgba(212,175,55,.7)}
+.bal-box{display:flex;align-items:center;gap:12px;padding:14px 26px;background:linear-gradient(180deg,#2a0808,#1a0505);border:3px solid #d4af37;border-radius:14px;box-shadow:0 0 0 1px #8a6a10 inset,0 0 30px rgba(212,175,55,.5);overflow:hidden;position:relative;min-width:210px}
+.bal-box .lbl{font-size:.65em;font-weight:700;letter-spacing:3px;color:#d4af37;margin-bottom:4px;text-transform:uppercase}
+.bal-box .num{font-size:1.4em;font-weight:700;background:linear-gradient(180deg,#fff8d0,#ffd700 50%,#b8860b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-variant-numeric:tabular-nums}
+
+h1{text-align:center;font-size:2.5em;font-weight:800;letter-spacing:10px;background:linear-gradient(180deg,#fff8d0,#ffd700 40%,#b8860b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;margin-top:60px;}
+.subtitle{text-align:center;color:#d4af37;font-size:.75em;letter-spacing:8px;margin-bottom:30px;text-transform:uppercase;opacity:.85}
+
+/* ==================== РУЛЕТКА ==================== */
+.wheel-container{
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  aspect-ratio: 1;
+  margin: 0 auto 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  filter: drop-shadow(0 0 40px rgba(212, 175, 55, 0.5));
+}
+.wheel-pointer{
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0; height: 0;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  border-top: 30px solid #ffd700;
+  z-index: 10;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8));
+}
+canvas{
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  border: 6px solid #d4af37;
+  box-shadow: inset 0 0 30px rgba(0,0,0,0.8), 0 0 30px rgba(212,175,55,0.6);
+  background: #0a0202;
+}
+
+/* Кнопка и таймер */
+.wheel-controls{
+  text-align: center;
+  max-width: 400px;
+  margin: 0 auto;
+}
+.btn-spin{
+  width: 100%;
+  padding: 18px;
+  border-radius: 14px;
+  border: 3px solid #ffd700;
+  background: linear-gradient(180deg, #ffd700, #b8860b);
+  color: #0a0505;
+  font-family: Georgia;
+  font-weight: 900;
+  font-size: 1.2em;
+  letter-spacing: 2px;
+  cursor: pointer;
+  text-transform: uppercase;
+  box-shadow: 0 6px 0 #7a5a10, 0 0 25px rgba(255,215,0,0.4);
+  transition: all 0.15s;
+  margin-bottom: 15px;
+}
+.btn-spin:hover:not(:disabled){
+  transform: translateY(-2px);
+  box-shadow: 0 8px 0 #7a5a10, 0 0 40px rgba(255,215,0,0.9);
+}
+.btn-spin:active:not(:disabled){
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 #7a5a10;
+}
+.btn-spin:disabled{
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: linear-gradient(180deg, #333, #111);
+  border-color: #444;
+  color: #666;
+  box-shadow: none;
+  transform: none;
+}
+
+.timer-text{
+  font-size: 1em;
+  color: #d4af37;
+  letter-spacing: 1px;
+  font-weight: 700;
+}
+.timer-text span{
+  color: #ffd700;
+  font-family: Arial;
+  font-weight: 900;
+}
+
+/* Результат */
+.result-popup{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  backdrop-filter: blur(5px);
+}
+.result-popup.on{ display: flex; animation: fadeIn 0.3s; }
+@keyframes fadeIn{ from{opacity:0} to{opacity:1} }
+
+.result-box{
+  background: linear-gradient(180deg, #2a0808, #0a0202);
+  border: 3px solid #ffd700;
+  border-radius: 20px;
+  padding: 40px;
+  text-align: center;
+  box-shadow: 0 0 60px rgba(255,215,0,0.5);
+  animation: popIn 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+@keyframes popIn{ from{transform:scale(0.5); opacity:0} to{transform:scale(1); opacity:1} }
+
+.result-box .icon{ font-size: 4em; margin-bottom: 10px; }
+.result-box .txt{ font-size: 1.2em; color: #aaa; margin-bottom: 10px; }
+.result-box .amount{
+  font-size: 3em;
+  font-weight: 900;
+  font-family: Arial;
+  color: #1dd1a1;
+  text-shadow: 0 0 20px rgba(29,209,161,0.8);
+  margin-bottom: 20px;
+}
+.result-box button{
+  padding: 12px 30px;
+  border-radius: 10px;
+  border: 2px solid #ffd700;
+  background: transparent;
+  color: #ffd700;
+  font-weight: 900;
+  font-size: 1em;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.result-box button:hover{
+  background: #ffd700;
+  color: #0a0505;
+  box-shadow: 0 0 20px rgba(255,215,0,0.8);
+}
+
+@media(max-width:500px){
+  .wheel-container{ max-width: 300px; }
+  .result-box .amount{ font-size: 2em; }
+  h1{ font-size: 1.8em; }
+}
+</style>
+</head>
+<body>
+
+<!-- Верхняя панель (абсолютно позиционирована) -->
+<div class="top">
+  <a href="index.html" class="back">← НАЗАД</a>
+  <div class="bal-box">
+    <span>👑</span>
+    <div>
+      <div class="lbl">Баланс</div>
+      <div class="num">₽<span id="bal">150</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="c">
+  <h1>🎁 БОНУС</h1>
+  <div class="subtitle">✦ КРУТИ · ЗАБИРАЙ · ПОВТОРЯЙ ✦</div>
+
+  <!-- Рулетка -->
+  <div class="wheel-container">
+    <div class="wheel-pointer"></div>
+    <canvas id="wheelCanvas" width="800" height="800"></canvas>
+  </div>
+
+  <!-- Управление -->
+  <div class="wheel-controls">
+    <button class="btn-spin" id="spinBtn" onclick="spin()">🎰 КРУТИТЬ РУЛЕТКУ</button>
+    <div class="timer-text" id="timerText">Доступно сейчас!</div>
+  </div>
+</div>
+
+<!-- Всплывающее окно с результатом -->
+<div class="result-popup" id="resultPopup">
+  <div class="result-box">
+    <div class="icon">🎉</div>
+    <div class="txt">Ты выиграл</div>
+    <div class="amount" id="resultAmount">+0 ₽</div>
+    <button onclick="closePopup()">ЗАБРАТЬ</button>
+  </div>
+</div>
+
+<script>
+var B = +(localStorage.getItem('kw_bal') || 150);
+var SPIN_KEY = 'kw_mini_wheel_last';
+var COOLDOWN = 30 * 60 * 1000; // 30 минут в миллисекундах
+var SECTORS = [1, 2, 1, 4, 1, 1, 6, 1, 10, 2]; // 10 секторов
+var colors = ['#4a0f0f', '#8a1515', '#4a0f0f', '#d4af37', '#4a0f0f', '#8a1515', '#b8860b', '#4a0f0f', '#ffd700', '#8a1515'];
+var canvas, ctx, centerX, centerY, radius;
+var currentAngle = 0;
+var isSpinning = false;
+
+function $(id){ return document.getElementById(id); }
+
+function fmt(n){
+  var r = Math.round(n*100)/100;
+  if(r%1===0) return Math.floor(r).toLocaleString('ru-RU');
+  return r.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+}
+
+function updateBal(){
+  $('bal').textContent = fmt(B);
+  localStorage.setItem('kw_bal', B);
+}
+
+// ==================== РЕНДЕР КОЛЕСА ====================
+function initWheel(){
+  canvas = $('wheelCanvas');
+  ctx = canvas.getContext('2d');
+  centerX = canvas.width / 2;
+  centerY = canvas.height / 2;
+  radius = canvas.width / 2 - 10;
+  drawWheel();
+}
+
+function drawWheel(){
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  var angleStep = (Math.PI * 2) / SECTORS.length;
+
+  for(var i = 0; i < SECTORS.length; i++){
+    var startAngle = currentAngle + i * angleStep;
+    var endAngle = startAngle + angleStep;
+    
+    // Сектор
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY);
+    ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+    ctx.closePath();
+    ctx.fillStyle = colors[i];
+    ctx.fill();
+    ctx.strokeStyle = '#0a0202';
+    ctx.lineWidth = 4;
+    ctx.stroke();
+
+    // Текст сектора
+    ctx.save();
+    ctx.translate(centerX, centerY);
+    ctx.rotate(startAngle + angleStep / 2);
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 60px Arial';
+    ctx.shadowColor = '#000';
+    ctx.shadowBlur = 10;
+    ctx.fillText(SECTORS[i] + ' ₽', radius - 40, 0);
+    ctx.restore();
+  }
+
+  // Центральный круг
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius * 0.15, 0, Math.PI * 2);
+  ctx.fillStyle = '#d4af37';
+  ctx.fill();
+  ctx.strokeStyle = '#0a0202';
+  ctx.lineWidth = 6;
+  ctx.stroke();
+}
+
+// ==================== ЛОГИКА ВРАЩЕНИЯ ====================
+function spin(){
+  if(isSpinning) return;
+  
+  var lastSpin = +(localStorage.getItem(SPIN_KEY) || 0);
+  var now = Date.now();
+  
+  if(now < lastSpin + COOLDOWN){
+    return; // Кнопка и так заблокирована
+  }
+
+  isSpinning = true;
+  $('spinBtn').disabled = true;
+
+  // Выбираем случайный выигрыш (с шансами 50/50 как в реальном казино)
+  // Сектора: 1, 2, 1, 4, 1, 1, 6, 1, 10, 2
+  var winIndex = Math.floor(Math.random() * SECTORS.length);
+  var winAmount = SECTORS[winIndex];
+
+  var angleStep = (Math.PI * 2) / SECTORS.length;
+  
+  // Вычисляем финальный угол, чтобы выигрышный сектор оказался под стрелкой (сверху)
+  // Стрелка смотрит вверх (-PI/2)
+  var targetAngle = -Math.PI / 2 - (winIndex * angleStep) - (angleStep / 2);
+  // Добавляем 5-8 полных оборотов для красоты
+  var fullSpins = 5 + Math.floor(Math.random() * 3);
+  var finalAngle = fullSpins * Math.PI * 2 + targetAngle;
+
+  var startAngle = currentAngle;
+  var duration = 4000; // 4 секунды
+  var startTime = Date.now();
+
+  function animate(){
+    var elapsed = Date.now() - startTime;
+    var progress = Math.min(elapsed / duration, 1);
+    
+    // Функция замедления (ease-out)
+    var easeOut = 1 - Math.pow(1 - progress, 4);
+    currentAngle = startAngle + (finalAngle - startAngle) * easeOut;
+    
+    drawWheel();
+    
+    if(progress < 1){
+      requestAnimationFrame(animate);
+    } else {
+      // Остановились
+      currentAngle = finalAngle % (Math.PI * 2);
+      drawWheel();
+      
+      // Выдаём награду
+      B += winAmount;
+      updateBal();
+      localStorage.setItem(SPIN_KEY, Date.now());
+      
+      // Показываем окно
+      $('resultAmount').textContent = '+' + winAmount + ' ₽';
+      $('resultPopup').classList.add('on');
+      
+      isSpinning = false;
+      updateTimer();
+    }
+  }
+  
+  requestAnimationFrame(animate);
+}
+
+// ==================== ТАЙМЕР ====================
+function updateTimer(){
+  var lastSpin = +(localStorage.getItem(SPIN_KEY) || 0);
+  var now = Date.now();
+  var nextSpin = lastSpin + COOLDOWN;
+  var btn = $('spinBtn');
+  var timerTxt = $('timerText');
+
+  if(now < nextSpin){
+    btn.disabled = true;
+    var left = nextSpin - now;
+    var m = Math.floor(left / 60000);
+    var s = Math.floor((left % 60000) / 1000);
+    timerTxt.innerHTML = 'Следующая попытка через: <span>' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0') + '</span>';
+  } else {
+    btn.disabled = false;
+    timerTxt.textContent = 'Доступно сейчас!';
+  }
+}
+
+function closePopup(){
+  $('resultPopup').classList.remove('on');
+}
+
+// ==================== ЗАПУСК ====================
+initWheel();
+updateBal();
+updateTimer();
+setInterval(updateTimer, 1000); // Обновляем таймер каждую секунду
+</script>
+</body>
+</html>

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>🎲 DICE — KINGWIN</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Georgia,serif}
+body{background: radial-gradient(ellipse at 50% 0%, #5a0f0f 0%, #2a0808 40%, #150505 70%, #0a0202 100%); color:#fff;min-height:100vh;padding:20px;display:flex;justify-content:center}
+.c{width:100%;max-width:800px;margin:0 auto}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;gap:12px;flex-wrap:wrap}
+.back{padding:10px 22px;border-radius:12px;background:linear-gradient(180deg,#2a0808,#1a0505);border:2px solid #d4af37;color:#ffd700;text-decoration:none;font-size:.85em;font-weight:700;letter-spacing:2px;transition:all .3s}
+.back:hover{transform:translateX(-4px);box-shadow:0 0 25px rgba(212,175,55,.7)}
+.bal-box{display:flex;align-items:center;gap:12px;padding:14px 26px;background:linear-gradient(180deg,#2a0808,#1a0505);border:3px solid #d4af37;border-radius:14px;box-shadow:0 0 0 1px #8a6a10 inset,0 0 30px rgba(212,175,55,.5);min-width:210px}
+.bal-box .lbl{font-size:.65em;font-weight:700;letter-spacing:3px;color:#d4af37;margin-bottom:4px;text-transform:uppercase}
+.bal-box .num{font-size:1.4em;font-weight:700;background:linear-gradient(180deg,#fff8d0,#ffd700 50%,#b8860b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-variant-numeric:tabular-nums}
+h1{text-align:center;font-size:2.5em;font-weight:800;letter-spacing:10px;background:linear-gradient(180deg,#fff8d0,#ffd700 40%,#b8860b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px}
+.subtitle{text-align:center;color:#d4af37;font-size:.75em;letter-spacing:8px;margin-bottom:26px;text-transform:uppercase;opacity:.85}
+.dice-area{background:linear-gradient(180deg,rgba(42,8,8,.95),rgba(10,2,2,.98));border:2px solid #d4af37;border-radius:20px;padding:30px 20px;text-align:center;margin-bottom:20px;box-shadow:0 0 30px rgba(212,175,55,.3),inset 0 0 40px rgba(0,0,0,.5);}
+.dice-simple{width:140px;height:140px;margin:0 auto 20px;background:linear-gradient(160deg,#fff8e0,#ffd700 40%,#b8860b);border:4px solid #8a6a10;border-radius:22px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);padding:14px;gap:6px;box-shadow:inset 0 0 25px rgba(140,100,10,.5),0 0 40px rgba(255,215,0,.5);transition:transform .15s;}
+.dice-simple.rolling{animation:shakeDice .35s linear infinite}
+@keyframes shakeDice{0%{transform:translate(0,0) rotate(0)}25%{transform:translate(-6px,5px) rotate(-7deg)}50%{transform:translate(6px,-5px) rotate(7deg)}75%{transform:translate(-5px,-4px) rotate(-5deg)}100%{transform:translate(0,0) rotate(0)}}
+.pip{background:radial-gradient(circle at 35% 35%,#4a1a5a,#1a0520);border-radius:50%;box-shadow:inset 0 2px 4px rgba(0,0,0,.6);width:85%;height:85%;align-self:center;justify-self:center}
+.result-text{font-size:1.2em;color:#d4af37;letter-spacing:2px;min-height:70px;font-weight:bold;display:flex;flex-direction:column;justify-content:center;align-items:center}
+.result-text .big{font-size:2em;color:#ffd700;font-weight:900;text-shadow:0 0 20px rgba(255,215,0,.8);margin:6px 0}
+.result-text.win .big{color:#1dd1a1;text-shadow:0 0 20px rgba(29,209,161,.9)}
+.result-text.lose .big{color:#ff6b6b;text-shadow:0 0 20px rgba(255,107,107,.9)}
+.slider-area{background:linear-gradient(180deg,rgba(42,8,8,.95),rgba(10,2,2,.98));border:2px solid #d4af37;border-radius:16px;padding:18px 22px;margin-bottom:16px;box-shadow:0 0 25px rgba(212,175,55,.3);}
+.slider-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.slider-header .label{font-size:.85em;color:#d4af37;letter-spacing:2px;text-transform:uppercase}
+.slider-header .val{font-size:1.3em;color:#ffd700;font-weight:900;font-family:Arial}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:12px;border-radius:6px;background:linear-gradient(90deg,#4a1a5a,#c084fc);outline:none;margin-bottom:14px;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:32px;height:32px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff4b0,#ffd700 50%,#b8860b);border:3px solid #ffd700;cursor:pointer;box-shadow:0 0 18px rgba(255,215,0,.9)}
+input[type=range]::-moz-range-thumb{width:32px;height:32px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff4b0,#ffd700 50%,#b8860b);border:3px solid #ffd700;cursor:pointer;box-shadow:0 0 18px rgba(255,215,0,.9)}
+.range-labels{display:flex;justify-content:space-between;font-size:.75em;color:#8a6a10;font-family:Arial}
+.info-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.info-box{background:rgba(0,0,0,.4);border:1px solid rgba(212,175,55,.3);border-radius:10px;padding:10px;text-align:center}
+.info-box .lbl{font-size:.65em;color:#d4af37;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.info-box .v{font-size:1.15em;color:#ffd700;font-weight:900;font-family:Arial}
+.info-box .v.green{color:#1dd1a1}
+.bet-controls{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-items:center;padding:16px;background:linear-gradient(180deg,rgba(42,8,8,.95),rgba(10,2,2,.98));border:2px solid #d4af37;border-radius:16px;margin-bottom:14px;box-shadow:0 0 25px rgba(212,175,55,.3)}
+.quick-bets{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.qbet{padding:8px 16px;border-radius:10px;background:linear-gradient(180deg,#2a0808,#1a0505);border:2px solid #d4af37;color:#ffd700;font-weight:700;font-size:.85em;font-family:Georgia;cursor:pointer;transition:all .2s}
+.qbet:hover{transform:translateY(-2px)}
+.bet-field{display:flex;align-items:center;gap:10px;padding:12px 18px;background:linear-gradient(180deg,#3a0a0a,#1a0505);border:3px solid #ffd700;border-radius:12px;box-shadow:0 0 20px rgba(255,215,0,.4)}
+.bet-field .lbl{font-size:.85em;color:#ffd700;font-weight:700;letter-spacing:2px}
+.bet-field input{width:110px;padding:10px;background:transparent;border:none;color:#fff8d0;font-size:1.2em;font-weight:900;text-align:center;font-family:Arial;font-variant-numeric:tabular-nums}
+.bet-field input:focus{outline:none}
+.action-buttons{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.btn-roll{padding:20px;border-radius:14px;border:3px solid;font-family:Georgia;font-size:1.05em;font-weight:900;letter-spacing:2px;cursor:pointer;text-transform:uppercase;transition:all .15s}
+.btn-low{background:linear-gradient(180deg,#e74c3c,#a93226);color:#fff;border-color:#ff6b6b;box-shadow:0 6px 0 #6a1a14,0 0 25px rgba(231,76,60,.4)}
+.btn-low:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 0 #6a1a14,0 0 40px rgba(231,76,60,.8)}
+.btn-high{background:linear-gradient(180deg,#1dd1a1,#0a8a6a);color:#0a1a14;border-color:#1dd1a1;box-shadow:0 6px 0 #063d32,0 0 25px rgba(29,209,161,.4)}
+.btn-high:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 0 #063d32,0 0 40px rgba(29,209,161,.8)}
+.btn-roll:active:not(:disabled){transform:translateY(4px);box-shadow:0 2px 0 currentColor}
+.btn-roll:disabled{opacity:.35;cursor:not-allowed;transform:none!important}
+.history-title{color:#d4af37;font-size:.8em;letter-spacing:3px;text-transform:uppercase;text-align:center;margin:14px 0 8px}
+.history-list{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;min-height:40px}
+.hist-item{padding:6px 12px;border-radius:8px;font-weight:700;font-size:.85em;background:linear-gradient(180deg,#2a0808,#1a0505);border:1.5px solid #d4af37;font-family:Arial;animation:popIn .3s}
+.hist-item.win{color:#1dd1a1;border-color:#1dd1a1}
+.hist-item.lose{color:#ff6b6b;border-color:#ff6b6b}
+@keyframes popIn{from{transform:scale(0)}to{transform:scale(1)}}
+.float-text{position:fixed;font-size:2em;font-weight:900;color:#ffd700;text-shadow:0 0 25px rgba(255,215,0,1);pointer-events:none;z-index:200;animation:floatUp 2s ease-out forwards}
+@keyframes floatUp{0%{opacity:0;transform:translateY(0) scale(.5)}20%{opacity:1;transform:translateY(-30px) scale(1.3)}100%{opacity:0;transform:translateY(-180px) scale(1)}}
+@media(max-width:500px){
+  h1{font-size:1.6em;letter-spacing:4px}
+  .dice-simple{width:110px;height:110px;padding:10px}
+  .btn-roll{padding:16px 10px;font-size:.9em}
+  .info-box .v{font-size:.95em}
+}
+</style>
+</head>
+<body>
+
+<div class="c">
+  <div class="top">
+    <a href="index.html" class="back">← НАЗАД</a>
+    <div class="bal-box">
+      <span>👑</span>
+      <div>
+        <div class="lbl">Баланс</div>
+        <div class="num">₽<span id="bal">0</span></div>
+      </div>
+    </div>
+  </div>
+
+  <h1>🎲 DICE</h1>
+  <div class="subtitle">✦ Меньше · Больше ✦</div>
+
+  <div class="dice-area">
+    <div class="dice-simple" id="dice"></div>
+    <div class="result-text" id="result">Сделай ставку и брось кубик</div>
+  </div>
+
+  <div class="slider-area">
+    <div class="slider-header">
+      <span class="label">🎯 Порог</span>
+      <span class="val" id="thresholdVal">3.50</span>
+    </div>
+    <input type="range" id="threshold" min="1.01" max="5.99" step="0.01" value="3.50">
+    <div class="range-labels">
+      <span>1.01</span>
+      <span>3.50</span>
+      <span>5.99</span>
+    </div>
+    <div class="info-row">
+      <div class="info-box">
+        <div class="lbl">Шанс победы</div>
+        <div class="v green" id="chance">50%</div>
+      </div>
+      <div class="info-box">
+        <div class="lbl">Множитель</div>
+        <div class="v" id="mult">×1.96</div>
+      </div>
+      <div class="info-box">
+        <div class="lbl">Выигрыш</div>
+        <div class="v" id="potential">₽196</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bet-controls">
+    <div class="quick-bets">
+      <button class="qbet" onclick="setBet(50)">50</button>
+      <button class="qbet" onclick="setBet(100)">100</button>
+      <button class="qbet" onclick="setBet(200)">200</button>
+      <button class="qbet" onclick="setBet(500)">500</button>
+      <button class="qbet" onclick="setBet(1000)">1000</button>
+    </div>
+    <div class="bet-field">
+      <span class="lbl">💰 Ставка ₽</span>
+      <input type="number" id="bet" value="100" min="10" max="1000" step="10">
+    </div>
+  </div>
+
+  <div class="action-buttons">
+    <button class="btn-roll btn-low" id="btnLow">🔻 МЕНЬШЕ</button>
+    <button class="btn-roll btn-high" id="btnHigh">🔺 БОЛЬШЕ</button>
+  </div>
+
+  <div class="history-title">📜 Последние броски</div>
+  <div class="history-list" id="historyList"></div>
+
+</div>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<script>
+var firebaseConfig = {
+  apiKey: "AIzaSyC8PI8bCzGB_tODO6MnOKAjkxXaASbA3vM",
+  authDomain: "kingwin-260a8.firebaseapp.com",
+  databaseURL: "https://kingwin-260a8-default-rtdb.firebaseio.com",
+  projectId: "kingwin-260a8",
+  storageBucket: "kingwin-260a8.firebasestorage.app",
+  messagingSenderId: "1085884746167",
+  appId: "1:1085884746167:web:9962cbc9eb5c876ae78032"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+var CURRENT_USER_KEY = 'kw_current_user';
+var B = 0;
+var rolling = false;
+var history = [];
+
+function $(i){ return document.getElementById(i); }
+function fmt(n){
+  var r = Math.round(n*100)/100;
+  if(r%1===0) return Math.floor(r).toLocaleString('ru-RU');
+  return r.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+}
+
+// ==================== БАЛАНС ====================
+function loadBalance(){
+  var uid = localStorage.getItem(CURRENT_USER_KEY);
+  if(!uid) { window.location.replace('auth.html?need_auth=1'); return; }
+
+  firebase.database().ref('users/' + uid).once('value').then(function(snapshot){
+    var user = snapshot.val();
+    if(!user){
+      localStorage.removeItem(CURRENT_USER_KEY);
+      window.location.replace('auth.html?need_auth=1');
+      return;
+    }
+    B = (user.realBalance || 0) + (user.bonusBalance || 0);
+    $('bal').textContent = fmt(B);
+  });
+}
+
+function setBalDisplay(newTotal){
+  B = newTotal;
+  $('bal').textContent = fmt(B);
+}
+
+// ==================== ЗВУКИ ====================
+var AC = null;
+function getAC(){ if(!AC){ try{ AC = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } if(AC && AC.state === 'suspended') AC.resume(); return AC; }
+
+function sRoll(){
+  var c = getAC(); if(!c) return;
+  for(var i=0;i<3;i++){
+    setTimeout(function(){
+      var o = c.createOscillator();
+      o.type = 'sine';
+      o.frequency.value = 400 + Math.random() * 200;
+      var g = c.createGain();
+      g.gain.setValueAtTime(.06, c.currentTime);
+      g.gain.exponentialRampToValueAtTime(.001, c.currentTime + .1);
+      o.connect(g); g.connect(c.destination);
+      o.start(); o.stop(c.currentTime + .12);
+    }, i * 80);
+  }
+}
+function sWin(){
+  var c = getAC(); if(!c) return;
+  [523, 659, 784, 1047].forEach(function(f, i){
+    setTimeout(function(){
+      var o = c.createOscillator();
+      o.type = 'triangle';
+      o.frequency.value = f;
+      var g = c.createGain();
+      g.gain.setValueAtTime(.18, c.currentTime);
+      g.gain.exponentialRampToValueAtTime(.01, c.currentTime + .4);
+      o.connect(g); g.connect(c.destination);
+      o.start(); o.stop(c.currentTime + .45);
+    }, i * 90);
+  });
+}
+function sLose(){
+  var c = getAC(); if(!c) return;
+  var o = c.createOscillator();
+  o.type = 'sine';
+  o.frequency.setValueAtTime(300, c.currentTime);
+  o.frequency.exponentialRampToValueAtTime(180, c.currentTime + .4);
+  var g = c.createGain();
+  g.gain.setValueAtTime(.1, c.currentTime);
+  g.gain.exponentialRampToValueAtTime(.001, c.currentTime + .5);
+  var f = c.createBiquadFilter();
+  f.type = 'lowpass';
+  f.frequency.value = 800;
+  o.connect(f); f.connect(g); g.connect(c.destination);
+  o.start(); o.stop(c.currentTime + .55);
+}
+
+// ==================== КУБИК ====================
+var PIPS = {
+  1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]
+};
+
+function drawDice(value){
+  var el = $('dice');
+  var html = '';
+  var pips = PIPS[value];
+  for(var i=0;i<9;i++){
+    if(pips.indexOf(i) >= 0) html += '<div class="pip"></div>';
+    else html += '<div></div>';
+  }
+  el.innerHTML = html;
+}
+drawDice(1);
+
+// ==================== UI ====================
+function getThreshold(){ return parseFloat($('threshold').value); }
+
+function calcChance(){
+  var t = getThreshold();
+  var low = 0, high = 0;
+  for(var n=1;n<=6;n++){
+    if(n < t) low++;
+    if(n > t) high++;
+  }
+  return { low: low, high: high, lowPct: low/6, highPct: high/6 };
+}
+
+function updateUI(){
+  var t = getThreshold();
+  $('thresholdVal').textContent = t.toFixed(2);
+  var c = calcChance();
+  var chance = 0, mult = 0;
+  if(c.low > 0){ chance = c.lowPct; mult = Math.floor((0.98/chance)*100)/100; }
+  else if(c.high > 0){ chance = c.highPct; mult = Math.floor((0.98/chance)*100)/100; }
+  $('chance').textContent = Math.round(chance*100) + '%';
+  $('mult').textContent = '×' + mult.toFixed(2);
+  var bet = +$('bet').value || 0;
+  $('potential').textContent = '₽' + fmt(bet * mult);
+  $('btnLow').disabled = rolling || c.low === 0;
+  $('btnHigh').disabled = rolling || c.high === 0;
+  $('btnLow').textContent = '🔻 МЕНЬШЕ ' + t.toFixed(2);
+  $('btnHigh').textContent = '🔺 БОЛЬШЕ ' + t.toFixed(2);
+}
+
+$('threshold').oninput = updateUI;
+$('bet').oninput = updateUI;
+
+function setBet(v){ if(rolling) return; $('bet').value = v; updateUI(); }
+
+// ==================== ИГРА ====================
+async function roll(choice){
+  if(rolling) return;
+  var bet = +$('bet').value || 0;
+  if(bet < 10){ alert('Минимальная ставка 10₽'); return; }
+  if(bet > 1000){ alert('Максимальная ставка 1000₽'); return; }
+  if(bet > B){ alert('Мало денег'); return; }
+
+  var c = calcChance();
+  if(choice === 'low' && c.low === 0){ alert('Нет чисел меньше порога'); return; }
+  if(choice === 'high' && c.high === 0){ alert('Нет чисел больше порога'); return; }
+
+  rolling = true;
+  updateUI();
+  $('result').className = 'result-text';
+  $('result').textContent = 'Бросаем...';
+  $('dice').classList.add('rolling');
+  sRoll();
+
+  // 1) Списываем ставку через сервер
+  var newTotal = await safeChangeBalance(-bet, 'bet');
+  if(newTotal === null){
+    rolling = false;
+    updateUI();
+    $('dice').classList.remove('rolling');
+    $('result').textContent = '❌ Ошибка списания ставки';
+    return;
+  }
+  setBalDisplay(newTotal);
+
+  // 2) Анимация
+  var flickerTimer = setInterval(function(){
+    drawDice(Math.floor(Math.random() * 6) + 1);
+  }, 90);
+
+  var value = Math.floor(Math.random() * 6) + 1;
+
+  setTimeout(async function(){
+    clearInterval(flickerTimer);
+    $('dice').classList.remove('rolling');
+    drawDice(value);
+    await finishRoll(value, choice, bet);
+  }, 1200);
+}
+
+async function finishRoll(value, choice, bet){
+  try {
+    var t = getThreshold();
+    var c = calcChance();
+    var won = false, chance = 0;
+    if(choice === 'low'){ won = value < t; chance = c.lowPct; }
+    else { won = value > t; chance = c.highPct; }
+
+    var mult = chance > 0 ? Math.floor((0.98/chance)*100)/100 : 0;
+    var win = won ? Math.floor(bet * mult) : 0;
+
+    // 3) Если выиграли — начисляем через сервер
+    if(won && win > 0){
+      var newTotal = await safeChangeBalance(win, 'win');
+      if(newTotal !== null) setBalDisplay(newTotal);
+    }
+
+    $('result').className = 'result-text ' + (won ? 'win' : 'lose');
+    var resHTML = '<div>Выпало: <b style="color:#ffd700;font-size:1.4em">' + value + '</b></div>';
+    if(won){
+      resHTML += '<div class="big">+₽' + fmt(win) + '</div>';
+      sWin();
+      showFloat('+₽' + fmt(win), '#1dd1a1');
+    } else {
+      resHTML += '<div class="big">−₽' + fmt(bet) + '</div>';
+      sLose();
+    }
+    $('result').innerHTML = resHTML;
+
+    history.unshift({ value: value, won: won });
+    if(history.length > 10) history.pop();
+    renderHistory();
+  } catch(e){
+    console.error('finishRoll error:', e);
+  } finally {
+    rolling = false;
+    updateUI();
+  }
+}
+
+function showFloat(text, color){
+  var el = document.createElement('div');
+  el.className = 'float-text';
+  el.textContent = text;
+  el.style.color = color || '#ffd700';
+  el.style.left = '50%';
+  el.style.top = '50%';
+  el.style.transform = 'translateX(-50%)';
+  document.body.appendChild(el);
+  setTimeout(function(){ el.remove(); }, 2000);
+}
+
+function renderHistory(){
+  var el = $('historyList');
+  el.innerHTML = '';
+  for(var i=0;i<history.length;i++){
+    var h = history[i];
+    var d = document.createElement('div');
+    d.className = 'hist-item ' + (h.won ? 'win' : 'lose');
+    d.textContent = h.value;
+    el.appendChild(d);
+  }
+}
+
+$('btnLow').onclick = function(){ roll('low'); };
+$('btnHigh').onclick = function(){ roll('high'); };
+
+// ==================== СТАРТ ====================
+updateUI();
+loadBalance();
+</script>
+</body>
+</html>

@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>🎯 PLINKO — KINGWIN</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Georgia,serif}
+body{background: radial-gradient(ellipse at 50% 0%, #5a0f0f 0%, #2a0808 40%, #150505 70%, #0a0202 100%);color:#fff;min-height:100vh;padding:10px;display:flex;justify-content:center;align-items:flex-start}
+.c{width:100%;max-width:780px;margin:0 auto}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:8px;flex-wrap:wrap}
+.back{padding:7px 14px;border-radius:10px;background:linear-gradient(180deg,#2a0808,#1a0505);border:2px solid #d4af37;color:#ffd700;text-decoration:none;font-size:.75em;font-weight:700;letter-spacing:1px}
+.back:hover{transform:translateX(-3px);box-shadow:0 0 18px rgba(212,175,55,.7)}
+.bal-box{display:flex;align-items:center;gap:8px;padding:9px 16px;background:linear-gradient(180deg,#2a0808,#1a0505);border:3px solid #d4af37;border-radius:12px;box-shadow:0 0 0 1px #8a6a10 inset,0 0 22px rgba(212,175,55,.5);min-width:160px}
+.bal-box .lbl{font-size:.5em;font-weight:700;letter-spacing:2px;color:#d4af37;margin-bottom:2px;text-transform:uppercase}
+.bal-box .num{font-size:1em;font-weight:700;background:linear-gradient(180deg,#fff8d0,#ffd700 50%,#b8860b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-variant-numeric:tabular-nums}
+h1{text-align:center;font-size:1.5em;font-weight:800;letter-spacing:7px;background:linear-gradient(180deg,#fff8d0,#ffd700 40%,#b8860b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:2px}
+.subtitle{text-align:center;color:#d4af37;font-size:.55em;letter-spacing:4px;margin-bottom:10px;text-transform:uppercase;opacity:.85}
+.layout{display:grid;grid-template-columns:1fr 240px;gap:10px;align-items:start}
+@media(max-width:700px){.layout{grid-template-columns:1fr}}
+.board-wrap{background:linear-gradient(180deg,rgba(42,8,8,.95),rgba(10,2,2,.98));border:2px solid #d4af37;border-radius:14px;padding:8px;box-shadow:0 0 25px rgba(212,175,55,.3);}
+#board{display:block;width:100%;height:auto;border-radius:10px}
+.panel{background:linear-gradient(180deg,rgba(42,8,8,.95),rgba(10,2,2,.98));border:2px solid #d4af37;border-radius:14px;padding:12px;box-shadow:0 0 25px rgba(212,175,55,.3)}
+.risk-select{display:flex;gap:4px;margin-bottom:8px}
+.risk-btn{flex:1;padding:7px 4px;border-radius:8px;background:linear-gradient(180deg,#2a0808,#1a0505);border:1.5px solid #d4af37;color:#ffd700;font-weight:700;font-size:.7em;font-family:Georgia;cursor:pointer;transition:all .15s;text-align:center}
+.risk-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 0 12px rgba(212,175,55,.6)}
+.risk-btn.active{background:linear-gradient(180deg,#ffd700,#b8860b);color:#0a0505;box-shadow:0 0 15px rgba(255,215,0,.7)}
+.risk-btn:disabled{opacity:.4;cursor:not-allowed}
+.balls-select{display:flex;gap:4px;margin-bottom:8px}
+.ball-btn{flex:1;padding:6px 4px;border-radius:8px;background:linear-gradient(180deg,#2a0808,#1a0505);border:1.5px solid #d4af37;color:#ffd700;font-weight:700;font-size:.7em;font-family:Georgia;cursor:pointer;transition:all .15s;text-align:center}
+.ball-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 0 12px rgba(212,175,55,.6)}
+.ball-btn.active{background:linear-gradient(180deg,#ffd700,#b8860b);color:#0a0505}
+.ball-btn:disabled{opacity:.4;cursor:not-allowed}
+.bet-field{display:flex;align-items:center;gap:6px;padding:6px 12px;background:linear-gradient(180deg,#3a0a0a,#1a0505);border:2px solid #ffd700;border-radius:9px;margin-bottom:8px;box-shadow:0 0 12px rgba(255,215,0,.4)}
+.bet-field .lbl{font-size:.7em;color:#ffd700;font-weight:700}
+.bet-field input{flex:1;padding:4px;background:transparent;border:none;color:#fff8d0;font-size:1em;font-weight:900;text-align:right;font-family:Arial;outline:none}
+.quick-bets{display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap;justify-content:center}
+.qbet{padding:5px 9px;border-radius:7px;background:linear-gradient(180deg,#2a0808,#1a0505);border:1.5px solid #d4af37;color:#ffd700;font-weight:700;font-size:.68em;font-family:Georgia;cursor:pointer;transition:all .15s}
+.qbet:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 0 10px rgba(212,175,55,.6)}
+.qbet:disabled{opacity:.4;cursor:not-allowed}
+.btn-drop{width:100%;padding:12px;border-radius:10px;background:linear-gradient(180deg,#ffd700,#b8860b);color:#0a0505;border:3px solid #ffd700;font-family:Georgia;font-weight:900;font-size:1em;letter-spacing:2px;cursor:pointer;text-transform:uppercase;box-shadow:0 5px 0 #7a5a10,0 0 20px rgba(255,215,0,.4);margin-bottom:8px;transition:all .15s}
+.btn-drop:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 5px 0 #7a5a10,0 0 35px rgba(255,215,0,.9)}
+.btn-drop:active:not(:disabled){transform:translateY(3px);box-shadow:0 2px 0 #7a5a10}
+.btn-drop:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+#status{font-size:.72em;color:#1dd1a1;min-height:30px;margin:4px 0;text-align:center;line-height:1.4}
+.float-text{position:fixed;font-size:1.8em;font-weight:900;color:#ffd700;text-shadow:0 0 25px rgba(255,215,0,1);pointer-events:none;z-index:200;animation:floatUp 2s ease-out forwards}
+@keyframes floatUp{0%{opacity:0;transform:translateY(0) scale(.5)}20%{opacity:1;transform:translateY(-30px) scale(1.3)}100%{opacity:0;transform:translateY(-180px) scale(1)}}
+</style>
+</head>
+<body>
+
+<div class="c">
+  <div class="top">
+    <a href="index.html" class="back">← НАЗАД</a>
+    <div class="bal-box">
+      <span>👑</span>
+      <div>
+        <div class="lbl">Баланс</div>
+        <div class="num">₽<span id="bal">0</span></div>
+      </div>
+    </div>
+  </div>
+
+  <h1>🎯 PLINKO</h1>
+  <div class="subtitle">✦ Падай · Прыгай · Побеждай ✦</div>
+
+  <div class="layout">
+    <div class="board-wrap">
+      <canvas id="board"></canvas>
+    </div>
+
+    <div class="panel">
+      <div class="risk-select" id="riskSelect">
+        <button class="risk-btn active" data-risk="low">НИЗКИЙ</button>
+        <button class="risk-btn" data-risk="mid">СРЕДНИЙ</button>
+        <button class="risk-btn" data-risk="high">ВЫСОКИЙ</button>
+      </div>
+
+      <div class="balls-select" id="ballsSelect">
+        <button class="ball-btn active" data-balls="1">1 шар</button>
+        <button class="ball-btn" data-balls="5">5</button>
+        <button class="ball-btn" data-balls="10">10</button>
+      </div>
+
+      <div class="quick-bets" id="quickBets">
+        <button class="qbet" onclick="setBet(50)">50</button>
+        <button class="qbet" onclick="setBet(100)">100</button>
+        <button class="qbet" onclick="setBet(200)">200</button>
+        <button class="qbet" onclick="setBet(500)">500</button>
+      </div>
+
+      <div class="bet-field">
+        <span class="lbl">💰 ₽</span>
+        <input type="number" id="bet" value="100" min="10" max="1000" step="10">
+      </div>
+
+      <button class="btn-drop" id="dropBtn">🎯 ЗАПУСТИТЬ</button>
+
+      <div id="status">Выбери риск и жми ЗАПУСТИТЬ</div>
+    </div>
+  </div>
+</div>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<script>
+var firebaseConfig = {
+  apiKey: "AIzaSyC8PI8bCzGB_tODO6MnOKAjkxXaASbA3vM",
+  authDomain: "kingwin-260a8.firebaseapp.com",
+  databaseURL: "https://kingwin-260a8-default-rtdb.firebaseio.com",
+  projectId: "kingwin-260a8",
+  storageBucket: "kingwin-260a8.firebasestorage.app",
+  messagingSenderId: "1085884746167",
+  appId: "1:1085884746167:web:9962cbc9eb5c876ae78032"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+var CURRENT_USER_KEY = 'kw_current_user';
+var B = 0;
+var risk = 'low';
+var ballCount = 1;
+var playing = false;
+
+var canvas, ctx;
+var BOARD_W = 500, BOARD_H = 500;
+var ROWS = 10;
+var SLOTS = 11;
+var TOP_Y = 50;
+var SLOT_Y = 0;
+var PEG_R = 4;
+
+var pegPositions = [];
+var slotXs = [];
+var balls = [];
+var roundResults = [];
+
+var RISKS = {
+  low:  { mults: [5.6, 2.1, 1.1, 1.0, 0.5, 0.3, 0.5, 1.0, 1.1, 2.1, 5.6] },
+  mid:  { mults: [13, 3, 1.3, 0.7, 0.4, 0.2, 0.4, 0.7, 1.3, 3, 13] },
+  high: { mults: [76, 10, 3, 0.9, 0.3, 0.2, 0.3, 0.9, 3, 10, 76] }
+};
+
+function $(id){ return document.getElementById(id); }
+function fmt(n){
+  var r = Math.round(n*100)/100;
+  if(r%1===0) return Math.floor(r).toLocaleString('ru-RU');
+  return r.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+}
+function setBet(v){ if(playing) return; $('bet').value = v; }
+
+// ==================== БАЛАНС ====================
+function loadBalance(){
+  var uid = localStorage.getItem(CURRENT_USER_KEY);
+  if(!uid){ window.location.replace('auth.html?need_auth=1'); return; }
+  firebase.database().ref('users/' + uid).once('value').then(function(snapshot){
+    var user = snapshot.val();
+    if(!user){
+      localStorage.removeItem(CURRENT_USER_KEY);
+      window.location.replace('auth.html?need_auth=1');
+      return;
+    }
+    B = (user.realBalance || 0) + (user.bonusBalance || 0);
+    $('bal').textContent = fmt(B);
+  });
+}
+
+function setBalDisplay(newTotal){
+  B = newTotal;
+  $('bal').textContent = fmt(B);
+}
+
+// ==================== SAFE CHANGE ====================
+async function safeChangeBalance(delta, type){
+  var uid = localStorage.getItem(CURRENT_USER_KEY);
+  if(!uid) return null;
+  var user = firebase.auth().currentUser;
+  if(!user) return null;
+
+  try{
+    var idToken = await user.getIdToken();
+    var resp = await fetch('/.netlify/functions/updateBalance', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + idToken },
+      body: JSON.stringify({ delta: delta, type: type || 'game' })
+    });
+    if(!resp.ok){
+      console.error('updateBalance error', resp.status, await resp.text());
+      return null;
+    }
+    var data = await resp.json();
+    return data.total;
+  }catch(e){
+    console.error('safeChangeBalance exception', e);
+    return null;
+  }
+}
+
+// ==================== ЗВУКИ ====================
+var AC = null;
+function getAC(){ try{ if(!AC) AC = new (window.AudioContext||window.webkitAudioContext)(); if(AC.state === 'suspended') AC.resume(); return AC; }catch(e){ return null; } }
+function sPeg(){try{var c=getAC();if(!c)return;var o=c.createOscillator();o.type='sine';o.frequency.value=600+Math.random()*400;var g=c.createGain();g.gain.setValueAtTime(.04,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.06);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.07)}catch(e){}}
+function sSlot(){try{var c=getAC();if(!c)return;[523,659,784].forEach(function(f,i){setTimeout(function(){try{var o=c.createOscillator();o.type='triangle';o.frequency.value=f;var g=c.createGain();g.gain.setValueAtTime(.12,c.currentTime);g.gain.exponentialRampToValueAtTime(.01,c.currentTime+.2);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.25)}catch(e){}},i*60)})}catch(e){}}
+
+// ==================== ПОЛЕ ====================
+function calcLayout(){
+  var paddingX = 20;
+  var usableW = BOARD_W - paddingX * 2;
+  var rowH = (BOARD_H - TOP_Y - 90) / (ROWS - 1);
+
+  pegPositions = [];
+  for(var r=0; r<ROWS; r++){
+    var count = r + 1;
+    var rowArr = [];
+    var leftX, rightX;
+    if(r === 0){
+      leftX = rightX = BOARD_W / 2;
+    } else {
+      var spread = usableW * (r / (ROWS - 1));
+      leftX = (BOARD_W - spread) / 2;
+      rightX = (BOARD_W + spread) / 2;
+    }
+    var spacing = r === 0 ? 0 : (rightX - leftX) / (count - 1);
+    for(var i=0; i<count; i++){
+      rowArr.push({ x: leftX + i * spacing, y: TOP_Y + r * rowH });
+    }
+    pegPositions.push(rowArr);
+  }
+
+  SLOTS = ROWS;
+  var slotY = BOARD_H - 60;
+  SLOT_Y = slotY;
+  var slotW = (BOARD_W - 40) / SLOTS;
+  slotXs = [];
+  for(var s=0; s<SLOTS; s++){
+    slotXs.push({ x: 20 + s * slotW + slotW/2, w: slotW, y: slotY });
+  }
+}
+
+function resize(){
+  canvas = $('board');
+  var dpr = window.devicePixelRatio || 1;
+  var w = canvas.parentElement.clientWidth - 16;
+  var h = Math.round(w * 1.05);
+  canvas.style.width = w + 'px';
+  canvas.style.height = h + 'px';
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+  ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  BOARD_W = w;
+  BOARD_H = h;
+  calcLayout();
+}
+
+function draw(){
+  if(!ctx) return;
+  ctx.clearRect(0, 0, BOARD_W, BOARD_H);
+
+  // Пеги
+  for(var r=0; r<pegPositions.length; r++){
+    for(var i=0; i<pegPositions[r].length; i++){
+      var p = pegPositions[r][i];
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, PEG_R, 0, Math.PI*2);
+      ctx.fillStyle = '#d4af37';
+      ctx.shadowColor = '#ffd700';
+      ctx.shadowBlur = 6;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+  }
+
+  // Слоты
+  var mults = RISKS[risk].mults;
+  for(var s=0; s<SLOTS; s++){
+    var sx = slotXs[s].x - slotXs[s].w/2 + 2;
+    var sy = SLOT_Y;
+    var sw = slotXs[s].w - 4;
+    var m = mults[s];
+    var color, bg;
+    if(m >= 10){ color = '#ff6b6b'; bg = 'rgba(90,10,10,.9)'; }
+    else if(m >= 3){ color = '#feca57'; bg = 'rgba(90,50,10,.9)'; }
+    else if(m >= 1){ color = '#1dd1a1'; bg = 'rgba(10,58,42,.9)'; }
+    else { color = '#888'; bg = 'rgba(30,30,30,.9)'; }
+
+    ctx.fillStyle = bg;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    roundRect(ctx, sx, sy, sw, 44, 8);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = color;
+    ctx.font = 'bold 11px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('×' + m, sx + sw/2, sy + 22);
+  }
+
+  // Шары
+  for(var b=0; b<balls.length; b++){
+    var ball = balls[b];
+    if(ball.trail && ball.trail.length > 1){
+      for(var t=0; t<ball.trail.length; t++){
+        var tr = ball.trail[t];
+        var alpha = (t + 1) / ball.trail.length * 0.4;
+        ctx.beginPath();
+        ctx.arc(tr.x, tr.y, 4, 0, Math.PI*2);
+        ctx.fillStyle = 'rgba(255,215,0,' + alpha + ')';
+        ctx.fill();
+      }
+    }
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, 6, 0, Math.PI*2);
+    ctx.fillStyle = '#ffd700';
+    ctx.shadowColor = '#ffd700';
+    ctx.shadowBlur = 15;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+}
+
+function roundRect(ctx, x, y, w, h, r){
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function createBall(){
+  var path = [];
+  for(var i=0; i<ROWS-1; i++){
+    path.push(Math.random() < 0.5 ? 0 : 1);
+  }
+  var startX = pegPositions[0][0].x;
+  var startY = 20;
+  return {
+    x: startX, y: startY,
+    path: path,
+    totalTime: 1.6 + Math.random() * 0.4,
+    t: 0,
+    trail: [],
+    done: false,
+    finalSlot: -1
+  };
+}
+
+// ==================== ИГРА ====================
+$('dropBtn').onclick = async function(){
+  if(playing) return;
+  var bet = parseInt($('bet').value) || 0;
+  if(bet < 10){ alert('Мин. ставка 10₽'); return; }
+  if(bet > 1000){ alert('Макс. ставка 1000₽'); return; }
+
+  var totalCost = bet * ballCount;
+  if(totalCost > B){ alert('Не хватает на все шары'); return; }
+
+  // Списываем ставку через сервер
+  var newTotal = await safeChangeBalance(-totalCost, 'bet');
+  if(newTotal === null){ alert('❌ Ошибка списания ставки'); return; }
+  setBalDisplay(newTotal);
+
+  playing = true;
+  $('dropBtn').disabled = true;
+  roundResults = [];
+
+  balls = [];
+  var pending = ballCount;
+  var dropNext = function(){
+    if(pending <= 0) return;
+    balls.push(createBall());
+    pending--;
+    if(pending > 0) setTimeout(dropNext, 200);
+  };
+  dropNext();
+
+  $('status').textContent = 'Шары падают...';
+
+  var lastTime = performance.now();
+  function animate(now){
+    var dt = Math.min((now - lastTime) / 1000, 0.05);
+    lastTime = now;
+    updateBalls(dt);
+    draw();
+    var active = false;
+    for(var i=0; i<balls.length; i++) if(!balls[i].done) active = true;
+    if(active) requestAnimationFrame(animate);
+    else finishRound();
+  }
+  requestAnimationFrame(animate);
+};
+
+function updateBalls(dt){
+  for(var b=0; b<balls.length; b++){
+    var ball = balls[b];
+    if(ball.done) continue;
+
+    ball.t += dt;
+    var progress = ball.t / ball.totalTime;
+
+    if(progress >= 1){
+      ball.done = true;
+      var slot = 0;
+      for(var p=0; p<ball.path.length; p++) slot += ball.path[p];
+      ball.finalSlot = Math.min(SLOTS - 1, Math.max(0, slot));
+      ball.x = slotXs[ball.finalSlot].x;
+      ball.y = SLOT_Y + 22;
+      onBallFinish(ball);
+      continue;
+    }
+
+    var stepProgress = progress * ball.path.length;
+    var stepIdx = Math.min(ball.path.length - 1, Math.floor(stepProgress));
+    var localT = stepProgress - stepIdx;
+
+    var idxInRow = 0;
+    for(var p=0; p<stepIdx; p++) idxInRow += ball.path[p];
+
+    var startPeg = pegPositions[stepIdx][Math.min(idxInRow, pegPositions[stepIdx].length - 1)];
+    var endIdx = idxInRow + ball.path[stepIdx];
+    var endPeg = pegPositions[stepIdx + 1][Math.min(endIdx, pegPositions[stepIdx + 1].length - 1)];
+
+    ball.x = startPeg.x + (endPeg.x - startPeg.x) * localT;
+    ball.y = startPeg.y + (endPeg.y - startPeg.y) * localT;
+
+    if(localT > 0.95 && !ball._playedStep) {
+      sPeg();
+      ball._playedStep = true;
+    }
+    if(localT < 0.5) ball._playedStep = false;
+
+    ball.trail.push({x: ball.x, y: ball.y});
+    if(ball.trail.length > 10) ball.trail.shift();
+  }
+}
+
+function onBallFinish(ball){
+  var mult = RISKS[risk].mults[ball.finalSlot];
+  var bet = parseInt($('bet').value) || 0;
+  var win = Math.floor(bet * mult);
+  roundResults.push({ slot: ball.finalSlot, mult: mult, win: win, bet: bet });
+  sSlot();
+}
+
+async function finishRound(){
+  // Суммарный выигрыш
+  var totalBet = 0, totalWin = 0;
+  for(var i=0; i<roundResults.length; i++){
+    totalBet += roundResults[i].bet;
+    totalWin += roundResults[i].win;
+  }
+
+  // Начисляем суммарный выигрыш через сервер
+  if(totalWin > 0){
+    var newTotal = await safeChangeBalance(totalWin, 'win');
+    if(newTotal !== null) setBalDisplay(newTotal);
+  }
+
+  var net = totalWin - totalBet;
+  var color = net >= 0 ? '#1dd1a1' : '#ff6b6b';
+  var sign = net >= 0 ? '+' : '';
+
+  $('status').innerHTML =
+    'Выпало: <b>' + roundResults.map(function(r){ return '×' + r.mult; }).join(' · ') + '</b>' +
+    '<br><span style="color:' + color + ';font-weight:900">' + sign + '₽' + fmt(net) + '</span>' +
+    ' (ставил ₽' + fmt(totalBet) + ' → получил ₽' + fmt(totalWin) + ')';
+
+  if(net > 0) floatText('+' + fmt(net), '#1dd1a1');
+  else if(net < 0) floatText('−' + fmt(-net), '#ff6b6b');
+
+  playing = false;
+  $('dropBtn').disabled = false;
+
+  roundResults = [];
+  setTimeout(function(){
+    balls = [];
+    draw();
+  }, 3000);
+}
+
+// ==================== ВЫБОР РИСКА/ШАРОВ ====================
+$('riskSelect').onclick = function(e){
+  var btn = e.target.closest('.risk-btn');
+  if(!btn || playing) return;
+  var all = document.querySelectorAll('.risk-btn');
+  for(var i=0;i<all.length;i++) all[i].classList.remove('active');
+  btn.classList.add('active');
+  risk = btn.dataset.risk;
+  draw();
+};
+
+$('ballsSelect').onclick = function(e){
+  var btn = e.target.closest('.ball-btn');
+  if(!btn || playing) return;
+  var all = document.querySelectorAll('.ball-btn');
+  for(var i=0;i<all.length;i++) all[i].classList.remove('active');
+  btn.classList.add('active');
+  ballCount = parseInt(btn.dataset.balls);
+};
+
+function floatText(text, color){
+  var el = document.createElement('div');
+  el.className = 'float-text';
+  el.textContent = text;
+  el.style.color = color || '#ffd700';
+  el.style.left = '50%'; el.style.top = '50%';
+  el.style.transform = 'translateX(-50%)';
+  document.body.appendChild(el);
+  setTimeout(function(){ el.remove(); }, 2000);
+}
+
+// ==================== СТАРТ ====================
+window.addEventListener('resize', function(){ resize(); draw(); });
+setTimeout(function(){ resize(); draw(); }, 50);
+loadBalance();
+</script>
+</body>
+</html>

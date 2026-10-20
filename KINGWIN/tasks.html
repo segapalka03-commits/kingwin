@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>📋 ЗАДАНИЯ — KINGWIN</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Georgia,serif}
+body{background: radial-gradient(ellipse at 50% 0%, #5a0f0f 0%, #2a0808 40%, #150505 70%, #0a0202 100%); color:#fff;min-height:100vh;padding:20px;display:flex;justify-content:center}
+.c{width:100%;max-width:900px;margin:0 auto}
+
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;gap:12px;flex-wrap:wrap}
+.back{padding:10px 22px;border-radius:12px;background:linear-gradient(180deg,#2a0808,#1a0505);border:2px solid #d4af37;color:#ffd700;text-decoration:none;font-size:.85em;font-weight:700;letter-spacing:2px;transition:all .3s}
+.back:hover{transform:translateX(-4px);box-shadow:0 0 25px rgba(212,175,55,.7)}
+.bal-box{display:flex;align-items:center;gap:12px;padding:14px 26px;background:linear-gradient(180deg,#2a0808,#1a0505);border:3px solid #d4af37;border-radius:14px;box-shadow:0 0 0 1px #8a6a10 inset,0 0 30px rgba(212,175,55,.5);overflow:hidden;position:relative;min-width:210px}
+.bal-box .lbl{font-size:.65em;font-weight:700;letter-spacing:3px;color:#d4af37;margin-bottom:4px;text-transform:uppercase}
+.bal-box .num{font-size:1.4em;font-weight:700;background:linear-gradient(180deg,#fff8d0,#ffd700 50%,#b8860b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-variant-numeric:tabular-nums}
+
+h1{text-align:center;font-size:2.5em;font-weight:800;letter-spacing:10px;background:linear-gradient(180deg,#fff8d0,#ffd700 40%,#b8860b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px}
+.subtitle{text-align:center;color:#d4af37;font-size:.75em;letter-spacing:8px;margin-bottom:26px;text-transform:uppercase;opacity:.85}
+
+.tasks-grid{display:grid;grid-template-columns:1fr;gap:14px;max-width:700px;margin:0 auto 30px}
+
+.task-card{
+  background:linear-gradient(180deg,rgba(42,8,8,.95),rgba(10,2,2,.98));
+  border:2px solid #d4af37;
+  border-radius:16px;
+  padding:18px 20px;
+  display:flex;align-items:center;gap:16px;
+  transition:all .3s;
+  position:relative;
+  overflow:hidden;
+}
+.task-card:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,0,0,.6),0 0 30px rgba(212,175,55,.4)}
+.task-card.completed{border-color:#1dd1a1;box-shadow:0 0 25px rgba(29,209,161,.5)}
+.task-card.claimed{opacity:.6;border-color:#555}
+
+.task-icon{font-size:2.5em;flex-shrink:0;filter:drop-shadow(0 0 10px currentColor)}
+
+.task-body{flex:1;display:flex;flex-direction:column;gap:6px}
+.task-title{font-size:1.05em;font-weight:900;color:#ffd700;letter-spacing:1px}
+.task-desc{font-size:.75em;color:#aaa}
+.task-progress-bar{
+  width:100%;height:10px;background:rgba(0,0,0,.5);border-radius:5px;overflow:hidden;
+  border:1px solid rgba(212,175,55,.3);
+}
+.task-progress-fill{
+  height:100%;
+  background:linear-gradient(90deg,#d4af37,#ffd700,#d4af37);
+  border-radius:5px;
+  transition:width .4s;
+  box-shadow:0 0 10px rgba(255,215,0,.6);
+}
+.task-progress-text{font-size:.7em;color:#d4af37;text-align:right;margin-top:2px}
+
+.task-reward{
+  flex-shrink:0;
+  text-align:center;
+  display:flex;flex-direction:column;gap:6px;align-items:center;
+}
+.task-reward .amount{
+  font-size:1.2em;font-weight:900;color:#1dd1a1;font-family:Arial;
+  text-shadow:0 0 10px rgba(29,209,161,.6);
+}
+.btn-claim{
+  padding:10px 18px;border-radius:10px;
+  border:2px solid #ffd700;
+  background:linear-gradient(180deg,#ffd700,#b8860b);
+  color:#0a0505;font-weight:900;font-size:.8em;letter-spacing:1px;
+  cursor:pointer;transition:all .2s;text-transform:uppercase;
+  box-shadow:0 3px 0 #7a5a10;
+}
+.btn-claim:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 5px 0 #7a5a10,0 0 25px rgba(255,215,0,.8)}
+.btn-claim:active:not(:disabled){transform:translateY(2px);box-shadow:0 1px 0 #7a5a10}
+.btn-claim:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-claim.claimed{background:linear-gradient(180deg,#333,#111);color:#666;border-color:#444}
+
+.reset-timer{
+  text-align:center;color:#d4af37;font-size:.85em;letter-spacing:2px;
+  margin-top:20px;text-transform:uppercase;
+}
+.reset-timer span{color:#ffd700;font-weight:900;font-family:Arial}
+
+.info-banner{
+  background:linear-gradient(90deg,rgba(255,215,0,.1),rgba(255,215,0,.05));
+  border:1px solid rgba(212,175,55,.4);
+  border-radius:12px;
+  padding:14px 20px;
+  text-align:center;
+  font-size:.8em;
+  color:#d4af37;
+  letter-spacing:1px;
+  margin-bottom:20px;
+  max-width:700px;
+  margin-left:auto;margin-right:auto;
+}
+
+.toast{
+  position:fixed;top:20px;left:50%;transform:translateX(-50%);
+  padding:12px 24px;border-radius:12px;
+  background:linear-gradient(180deg,#1dd1a1,#0a8a6a);
+  color:#0a1a14;font-weight:900;letter-spacing:1px;
+  box-shadow:0 0 30px rgba(29,209,161,.7);
+  z-index:9999;opacity:0;transition:opacity .3s;
+}
+.toast.on{opacity:1}
+
+@media(max-width:600px){
+  h1{font-size:1.6em;letter-spacing:4px}
+  .task-card{flex-direction:column;text-align:center;gap:10px}
+  .task-reward{flex-direction:row;gap:12px}
+}
+</style>
+</head>
+<body>
+
+<div class="c">
+  <div class="top">
+    <a href="index.html" class="back">← НАЗАД</a>
+    <div class="bal-box">
+      <span>👑</span>
+      <div>
+        <div class="lbl">Баланс</div>
+        <div class="num">₽<span id="bal">150</span></div>
+      </div>
+    </div>
+  </div>
+
+  <h1>📋 ЗАДАНИЯ</h1>
+  <div class="subtitle">✦ ВЫПОЛНЯЙ · ПОЛУЧАЙ · ПОВТОРЯЙ ✦</div>
+
+  <div class="info-banner">
+    🕐 Задания обновляются каждые 24 часа. Не пропусти награды!
+  </div>
+
+  <div class="tasks-grid" id="tasksGrid"></div>
+
+  <div class="reset-timer">
+    Обновление через: <span id="resetTimer">--:--:--</span>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ==================== КОНФИГ ====================
+var RESET_KEY = 'kw_tasks_reset_time';
+var TASKS_KEY = 'kw_tasks_state';
+
+var TASKS = [
+  { id:'login', icon:'🎁', title:'Ежедневный вход', desc:'Просто зайди в игру', goal:1, reward:100 },
+  { id:'crash5', icon:'🚀', title:'Crash-марафон', desc:'Сыграй 5 раундов в Crash', goal:5, reward:250 },
+  { id:'cases3', icon:'📦', title:'Открыватель кейсов', desc:'Открой 3 кейса', goal:3, reward:300 },
+  { id:'win1000', icon:'💰', title:'Куш дня', desc:'Выиграй 1 000 ₽ за день', goal:1000, reward:500 },
+  { id:'games3', icon:'🎮', title:'Разносторонний', desc:'Сыграй в 3 разные игры', goal:3, reward:400 },
+  { id:'bet500', icon:'🎲', title:'Азартный', desc:'Сделай ставок на 500 ₽', goal:500, reward:200 }
+];
+
+function $(id){ return document.getElementById(id); }
+function fmt(n){
+  var r = Math.round(n*100)/100;
+  if(r%1===0) return Math.floor(r).toLocaleString('ru-RU');
+  return r.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+}
+
+// ==================== СОСТОЯНИЕ ====================
+var state = {};
+try { state = JSON.parse(localStorage.getItem(TASKS_KEY) || '{}'); } catch(e){ state = {}; }
+
+var resetTime = +(localStorage.getItem(RESET_KEY) || 0);
+var now = Date.now();
+if(now >= resetTime){
+  state = {};
+  localStorage.setItem(RESET_KEY, now + 24*60*60*1000);
+  localStorage.setItem(TASKS_KEY, JSON.stringify(state));
+}
+
+TASKS.forEach(function(t){
+  if(!state[t.id]) state[t.id] = { progress: 0, claimed: false };
+});
+
+if(!state.login.claimed && state.login.progress < 1){
+  state.login.progress = 1;
+}
+localStorage.setItem(TASKS_KEY, JSON.stringify(state));
+
+// ==================== БАЛАНС ====================
+var B = +(localStorage.getItem('kw_bal') || 150);
+function uUI(){ $('bal').textContent = fmt(B); }
+
+function showToast(text){
+  var t = $('toast');
+  t.textContent = text;
+  t.classList.add('on');
+  setTimeout(function(){ t.classList.remove('on'); }, 2500);
+}
+
+// ==================== РЕНДЕР ====================
+function render(){
+  var grid = $('tasksGrid');
+  grid.innerHTML = '';
+  
+  TASKS.forEach(function(task){
+    var s = state[task.id] || { progress: 0, claimed: false };
+    var percent = Math.min(100, (s.progress / task.goal) * 100);
+    var completed = s.progress >= task.goal;
+    
+    var card = document.createElement('div');
+    card.className = 'task-card';
+    if(completed) card.classList.add('completed');
+    if(s.claimed) card.classList.add('claimed');
+    
+    card.innerHTML = 
+      '<div class="task-icon">' + task.icon + '</div>' +
+      '<div class="task-body">' +
+        '<div class="task-title">' + task.title + '</div>' +
+        '<div class="task-desc">' + task.desc + '</div>' +
+        '<div class="task-progress-bar"><div class="task-progress-fill" style="width:' + percent + '%"></div></div>' +
+        '<div class="task-progress-text">' + Math.min(s.progress, task.goal) + ' / ' + task.goal + '</div>' +
+      '</div>' +
+      '<div class="task-reward">' +
+        '<div class="amount">+' + fmt(task.reward) + ' ₽</div>' +
+        '<button class="btn-claim' + (s.claimed ? ' claimed' : '') + '" ' +
+          'data-id="' + task.id + '" ' +
+          'onclick="claimTask(\'' + task.id + '\')" ' +
+          (s.claimed || !completed ? 'disabled' : '') + '>' +
+          (s.claimed ? '✓ ПОЛУЧЕНО' : 'ЗАБРАТЬ') +
+        '</button>' +
+      '</div>';
+    
+    grid.appendChild(card);
+  });
+}
+
+function claimTask(id){
+  var task = null;
+  for(var i=0;i<TASKS.length;i++) if(TASKS[i].id === id) task = TASKS[i];
+  if(!task) return;
+  
+  var s = state[id];
+  if(!s || s.claimed) return;
+  if(s.progress < task.goal) return;
+  
+  s.claimed = true;
+  B += task.reward;
+  localStorage.setItem('kw_bal', B);
+  localStorage.setItem(TASKS_KEY, JSON.stringify(state));
+  
+  uUI();
+  render();
+  showToast('✅ +' + fmt(task.reward) + ' ₽ за «' + task.title + '»');
+}
+
+function updateTimer(){
+  var left = resetTime - Date.now();
+  if(left < 0) left = 0;
+  var h = Math.floor(left / 3600000);
+  var m = Math.floor((left % 3600000) / 60000);
+  var s = Math.floor((left % 60000) / 1000);
+  $('resetTimer').textContent = 
+    String(h).padStart(2,'0') + ':' + 
+    String(m).padStart(2,'0') + ':' + 
+    String(s).padStart(2,'0');
+}
+
+window.addEventListener('storage', function(e){
+  if(e.key === TASKS_KEY){
+    try { state = JSON.parse(e.newValue); } catch(err){}
+    render();
+  }
+});
+
+function syncProgressFromGames(){
+  var changed = false;
+  
+  var crashRounds = +(localStorage.getItem('kw_count_crash') || 0);
+  if(crashRounds > state.crash5.progress){
+    state.crash5.progress = Math.min(crashRounds, TASKS[1].goal);
+    changed = true;
+  }
+  
+  var casesOpened = +(localStorage.getItem('kw_count_cases') || 0);
+  if(casesOpened > state.cases3.progress){
+    state.cases3.progress = Math.min(casesOpened, TASKS[2].goal);
+    changed = true;
+  }
+  
+  var totalWin = +(localStorage.getItem('kw_total_win') || 0);
+  if(totalWin > state.win1000.progress){
+    state.win1000.progress = Math.min(totalWin, TASKS[3].goal);
+    changed = true;
+  }
+  
+  var gamesPlayed = +(localStorage.getItem('kw_games_played') || 0);
+  if(gamesPlayed > state.games3.progress){
+    state.games3.progress = Math.min(gamesPlayed, TASKS[4].goal);
+    changed = true;
+  }
+  
+  var totalBets = +(localStorage.getItem('kw_total_bets') || 0);
+  if(totalBets > state.bet500.progress){
+    state.bet500.progress = Math.min(totalBets, TASKS[5].goal);
+    changed = true;
+  }
+  
+  if(changed){
+    localStorage.setItem(TASKS_KEY, JSON.stringify(state));
+    render();
+  }
+}
+
+uUI();
+render();
+syncProgressFromGames();
+setInterval(updateTimer, 1000);
+updateTimer();
+</script>
+</body>
+</html>

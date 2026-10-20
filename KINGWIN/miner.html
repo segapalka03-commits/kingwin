@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>💎 MINER — KINGWIN</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Georgia,serif}
+body{background: radial-gradient(ellipse at 50% 0%, #5a0f0f 0%, #2a0808 40%, #150505 70%, #0a0202 100%); color:#fff;min-height:100vh;padding:10px;display:flex;justify-content:center;align-items:flex-start}
+.c{width:100%;max-width:760px;margin:0 auto}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:8px;flex-wrap:wrap}
+.back{padding:7px 14px;border-radius:10px;background:linear-gradient(180deg,#2a0808,#1a0505);border:2px solid #d4af37;color:#ffd700;text-decoration:none;font-size:.75em;font-weight:700;letter-spacing:1px;transition:all .15s}
+.back:hover{transform:translateX(-3px);box-shadow:0 0 18px rgba(212,175,55,.7)}
+.bal-box{display:flex;align-items:center;gap:8px;padding:9px 16px;background:linear-gradient(180deg,#2a0808,#1a0505);border:3px solid #d4af37;border-radius:12px;box-shadow:0 0 0 1px #8a6a10 inset,0 0 22px rgba(212,175,55,.5);min-width:160px}
+.bal-box .lbl{font-size:.5em;font-weight:700;letter-spacing:2px;color:#d4af37;margin-bottom:2px;text-transform:uppercase}
+.bal-box .num{font-size:1em;font-weight:700;background:linear-gradient(180deg,#fff8d0,#ffd700 50%,#b8860b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-variant-numeric:tabular-nums}
+h1{text-align:center;font-size:1.5em;font-weight:800;letter-spacing:7px;background:linear-gradient(180deg,#fff8d0,#ffd700 40%,#b8860b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:2px}
+.subtitle{text-align:center;color:#d4af37;font-size:.55em;letter-spacing:4px;margin-bottom:10px;text-transform:uppercase;opacity:.85}
+.layout{display:grid;grid-template-columns:1fr 280px;gap:10px;align-items:start}
+@media(max-width:700px){.layout{grid-template-columns:1fr}}
+.field-wrap{background:linear-gradient(180deg,rgba(42,8,8,.95),rgba(10,2,2,.98));border:2px solid #d4af37;border-radius:14px;padding:10px;box-shadow:0 0 25px rgba(212,175,55,.3);}
+.field{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.cell{aspect-ratio:1;border-radius:8px;background:linear-gradient(160deg,#2a0808,#1a0505);border:2px solid #4a2a5a;cursor:pointer;font-size:1.5em;font-weight:900;font-family:Georgia;transition:all .15s;position:relative;display:flex;align-items:center;justify-content:center;color:#d4af37;user-select:none;}
+.cell:hover:not(.opened):not(.mine-revealed){transform:scale(1.05);border-color:#d4af37;box-shadow:0 0 15px rgba(212,175,55,.6)}
+.cell.opened{background:linear-gradient(180deg,#0a3a5a,#051f30);border-color:#48dbfb;color:#48dbfb;animation:pop .3s cubic-bezier(.18,.89,.32,1.28);}
+.cell.opened.diamond{background:linear-gradient(180deg,#0a5a3a,#051f14);border-color:#1dd1a1;color:#1dd1a1;box-shadow:0 0 15px rgba(29,209,161,.8);}
+.cell.mine-revealed{background:linear-gradient(180deg,#5a0a0a,#2a0505);border-color:#ff4444;color:#ff4444;animation:shake .4s;}
+.cell.mine-hit{background:linear-gradient(180deg,#ff4444,#8a1515);border-color:#fff;color:#fff;box-shadow:0 0 30px rgba(255,68,68,1);}
+@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.15)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.cell .hint{position:absolute;bottom:2px;right:4px;font-size:.45em;color:rgba(212,175,55,.6);font-family:Arial;font-weight:700;pointer-events:none;transition:all .15s;}
+.cell:hover:not(.opened):not(.mine-revealed) .hint{color:#ffd700;text-shadow:0 0 8px rgba(255,215,0,.9);}
+.panel{background:linear-gradient(180deg,rgba(42,8,8,.95),rgba(10,2,2,.98));border:2px solid #d4af37;border-radius:14px;padding:12px;box-shadow:0 0 25px rgba(212,175,55,.3)}
+.mult-box{background:rgba(0,0,0,.5);border:2px solid #d4af37;border-radius:10px;padding:8px 12px;text-align:center;margin-bottom:10px}
+.mult-box .lbl{font-size:.55em;color:#d4af37;letter-spacing:2px;text-transform:uppercase}
+.mult-box .val{font-size:1.4em;color:#ffd700;font-weight:900;font-family:Arial;text-shadow:0 0 15px rgba(255,215,0,.6)}
+.mult-box .val.green{color:#1dd1a1;text-shadow:0 0 15px rgba(29,209,161,.8)}
+.mines-select{display:flex;gap:4px;margin-bottom:10px;flex-wrap:wrap;justify-content:center}
+.mine-btn{flex:1;min-width:40px;padding:8px 4px;border-radius:8px;background:linear-gradient(180deg,#2a0808,#1a0505);border:1.5px solid #d4af37;color:#ffd700;font-weight:700;font-size:.75em;font-family:Georgia;cursor:pointer;transition:all .15s;text-align:center;}
+.mine-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 0 12px rgba(212,175,55,.6)}
+.mine-btn.active{background:linear-gradient(180deg,#ffd700,#b8860b);color:#0a0505;box-shadow:0 0 15px rgba(255,215,0,.7)}
+.mine-btn:disabled{opacity:.4;cursor:not-allowed}
+.bet-field{display:flex;align-items:center;gap:6px;padding:8px 12px;background:linear-gradient(180deg,#3a0a0a,#1a0505);border:2px solid #ffd700;border-radius:9px;margin-bottom:10px;box-shadow:0 0 15px rgba(255,215,0,.4)}
+.bet-field .lbl{font-size:.7em;color:#ffd700;font-weight:700}
+.bet-field input{flex:1;padding:4px;background:transparent;border:none;color:#fff8d0;font-size:1em;font-weight:900;text-align:right;font-family:Arial;outline:none}
+.quick-bets{display:flex;gap:4px;margin-bottom:10px;flex-wrap:wrap;justify-content:center}
+.qbet{padding:6px 10px;border-radius:7px;background:linear-gradient(180deg,#2a0808,#1a0505);border:1.5px solid #d4af37;color:#ffd700;font-weight:700;font-size:.7em;font-family:Georgia;cursor:pointer;transition:all .15s}
+.qbet:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 0 10px rgba(212,175,55,.6)}
+.qbet:disabled{opacity:.4;cursor:not-allowed}
+.btn-start,.btn-cashout{width:100%;padding:12px;border-radius:10px;font-family:Georgia;font-weight:900;font-size:.95em;letter-spacing:2px;cursor:pointer;text-transform:uppercase;transition:all .15s;border:3px solid;margin-bottom:8px;}
+.btn-start{background:linear-gradient(180deg,#ffd700,#b8860b);color:#0a0505;border-color:#ffd700;box-shadow:0 5px 0 #7a5a10,0 0 20px rgba(255,215,0,.4)}
+.btn-start:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 5px 0 #7a5a10,0 0 35px rgba(255,215,0,.9)}
+.btn-start:active:not(:disabled){transform:translateY(3px);box-shadow:0 2px 0 #7a5a10}
+.btn-start:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+.btn-cashout{background:linear-gradient(180deg,#1dd1a1,#0a8a6a);color:#0a1a14;border-color:#1dd1a1;box-shadow:0 5px 0 #063d32,0 0 20px rgba(29,209,161,.4);display:none}
+.btn-cashout.on{display:block}
+.btn-cashout:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 5px 0 #063d32,0 0 30px rgba(29,209,161,.9)}
+.btn-cashout:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+#status{font-size:.75em;color:#1dd1a1;min-height:36px;margin:4px 0;text-align:center;letter-spacing:.3px;line-height:1.4}
+.history-title{color:#d4af37;font-size:.65em;letter-spacing:2px;text-transform:uppercase;text-align:center;margin:10px 0 6px}
+.history-list{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;min-height:26px}
+.hist-item{padding:4px 8px;border-radius:6px;font-size:.7em;font-weight:900;font-family:Arial;background:rgba(0,0,0,.4);border:1.5px solid}
+.hist-item.win{color:#1dd1a1;border-color:#1dd1a1}
+.hist-item.lose{color:#ff6b6b;border-color:#ff6b6b}
+.float-text{position:fixed;font-size:1.8em;font-weight:900;color:#ffd700;text-shadow:0 0 25px rgba(255,215,0,1);pointer-events:none;z-index:200;animation:floatUp 2s ease-out forwards}
+@keyframes floatUp{0%{opacity:0;transform:translateY(0) scale(.5)}20%{opacity:1;transform:translateY(-30px) scale(1.3)}100%{opacity:0;transform:translateY(-180px) scale(1)}}
+.flash{position:fixed;inset:0;background:radial-gradient(circle,rgba(29,209,161,.4),transparent 60%);pointer-events:none;z-index:90;animation:flashFade .9s ease-out forwards}
+@keyframes flashFade{from{opacity:1}to{opacity:0}}
+</style>
+</head>
+<body>
+
+<div class="c">
+  <div class="top">
+    <a href="index.html" class="back">← НАЗАД</a>
+    <div class="bal-box">
+      <span>👑</span>
+      <div>
+        <div class="lbl">Баланс</div>
+        <div class="num">₽<span id="bal">0</span></div>
+      </div>
+    </div>
+  </div>
+
+  <h1>💎 MINER</h1>
+  <div class="subtitle">✦ Открывай · Ищи · Забирай ✦</div>
+
+  <div class="layout">
+    <div class="field-wrap">
+      <div class="field" id="field"></div>
+    </div>
+
+    <div class="panel">
+      <div class="mult-box">
+        <div class="lbl">💰 Множитель</div>
+        <div class="val" id="multVal">×1.00</div>
+      </div>
+
+      <div class="mines-select" id="minesSelect">
+        <button class="mine-btn active" data-mines="1">1 💣</button>
+        <button class="mine-btn" data-mines="3">3</button>
+        <button class="mine-btn" data-mines="5">5</button>
+        <button class="mine-btn" data-mines="10">10</button>
+        <button class="mine-btn" data-mines="15">15</button>
+      </div>
+
+      <div class="quick-bets" id="quickBets">
+        <button class="qbet" onclick="setBet(50)">50</button>
+        <button class="qbet" onclick="setBet(100)">100</button>
+        <button class="qbet" onclick="setBet(200)">200</button>
+        <button class="qbet" onclick="setBet(500)">500</button>
+        <button class="qbet" onclick="setBet(1000)">1000</button>
+      </div>
+
+      <div class="bet-field">
+        <span class="lbl">💰 ₽</span>
+        <input type="number" id="bet" value="100" min="10" max="1000" step="10">
+      </div>
+
+      <button class="btn-start" id="startBtn">💎 НАЧАТЬ</button>
+      <button class="btn-cashout" id="cashoutBtn" disabled>💰 ЗАБРАТЬ</button>
+
+      <div id="status">Выбери мины и жми НАЧАТЬ</div>
+    </div>
+  </div>
+
+  <div class="history-title">📜 История</div>
+  <div class="history-list" id="historyList"></div>
+</div>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<script>
+var firebaseConfig = {
+  apiKey: "AIzaSyC8PI8bCzGB_tODO6MnOKAjkxXaASbA3vM",
+  authDomain: "kingwin-260a8.firebaseapp.com",
+  databaseURL: "https://kingwin-260a8-default-rtdb.firebaseio.com",
+  projectId: "kingwin-260a8",
+  storageBucket: "kingwin-260a8.firebasestorage.app",
+  messagingSenderId: "1085884746167",
+  appId: "1:1085884746167:web:9962cbc9eb5c876ae78032"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+var CURRENT_USER_KEY = 'kw_current_user';
+var B = 0;
+var HOUSE_EDGE = 0.03;
+var CELLS = 25;
+var playing = false;
+var mineCount = 1;
+var currentBet = 0;
+var currentMult = 1;
+var opened = 0;
+var mines = [];
+var history = [];
+
+function $(id){ return document.getElementById(id); }
+function fmt(n){
+  var r = Math.round(n*100)/100;
+  if(r%1===0) return Math.floor(r).toLocaleString('ru-RU');
+  return r.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+}
+
+// ==================== БАЛАНС ====================
+function loadBalance(){
+  var uid = localStorage.getItem(CURRENT_USER_KEY);
+  if(!uid){ window.location.replace('auth.html?need_auth=1'); return; }
+  firebase.database().ref('users/' + uid).once('value').then(function(snapshot){
+    var user = snapshot.val();
+    if(!user){
+      localStorage.removeItem(CURRENT_USER_KEY);
+      window.location.replace('auth.html?need_auth=1');
+      return;
+    }
+    B = (user.realBalance || 0) + (user.bonusBalance || 0);
+    $('bal').textContent = fmt(B);
+  });
+}
+
+function setBalDisplay(newTotal){
+  B = newTotal;
+  $('bal').textContent = fmt(B);
+}
+
+// ==================== SAFE CHANGE ====================
+async function safeChangeBalance(delta, type){
+  var uid = localStorage.getItem(CURRENT_USER_KEY);
+  if(!uid) return null;
+  var user = firebase.auth().currentUser;
+  if(!user) return null;
+
+  try{
+    var idToken = await user.getIdToken();
+    var resp = await fetch('/.netlify/functions/updateBalance', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + idToken },
+      body: JSON.stringify({ delta: delta, type: type || 'game' })
+    });
+    if(!resp.ok){
+      console.error('updateBalance error', resp.status, await resp.text());
+      return null;
+    }
+    var data = await resp.json();
+    return data.total;
+  }catch(e){
+    console.error('safeChangeBalance exception', e);
+    return null;
+  }
+}
+
+function setBet(v){ if(playing) return; $('bet').value = v; }
+
+// ==================== ЗВУКИ ====================
+var AC = null;
+function getAC(){ if(!AC){ try{ AC = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } if(AC && AC.state === 'suspended') AC.resume(); return AC; }
+function sOpen(){ var c = getAC(); if(!c) return; var o=c.createOscillator(); o.type='sine'; o.frequency.setValueAtTime(700,c.currentTime); o.frequency.exponentialRampToValueAtTime(1000,c.currentTime+.1); var g=c.createGain(); g.gain.setValueAtTime(.06,c.currentTime); g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.15); o.connect(g); g.connect(c.destination); o.start(); o.stop(c.currentTime+.17) }
+function sBoom(){ var c = getAC(); if(!c) return; var o=c.createOscillator(); o.type='sawtooth'; o.frequency.setValueAtTime(150,c.currentTime); o.frequency.exponentialRampToValueAtTime(40,c.currentTime+.5); var g=c.createGain(); g.gain.setValueAtTime(.3,c.currentTime); g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.6); o.connect(g); g.connect(c.destination); o.start(); o.stop(c.currentTime+.65) }
+function sWin(){ var c = getAC(); if(!c) return; [523,659,784,1047].forEach(function(f,i){ setTimeout(function(){ try{ var o=c.createOscillator(); o.type='triangle'; o.frequency.value=f; var g=c.createGain(); g.gain.setValueAtTime(.16,c.currentTime); g.gain.exponentialRampToValueAtTime(.01,c.currentTime+.35); o.connect(g); g.connect(c.destination); o.start(); o.stop(c.currentTime+.4); }catch(e){} }, i*80) }) }
+
+// ==================== ПОЛЕ ====================
+function buildField(){
+  var f = $('field');
+  f.innerHTML = '';
+  for(var i=0;i<CELLS;i++){
+    var c = document.createElement('div');
+    c.className = 'cell';
+    c.dataset.idx = i;
+    c.onclick = (function(idx){ return function(){ clickCell(idx); }; })(i);
+    f.appendChild(c);
+  }
+}
+
+function getCellsEls(){ return $('field').querySelectorAll('.cell'); }
+
+function calcMult(k){
+  if(k === 0) return 1;
+  var m = 1 - HOUSE_EDGE;
+  for(var i=0;i<k;i++){
+    m = m * (CELLS - i) / (CELLS - mineCount - i);
+  }
+  return m;
+}
+
+function updateCellHints(){
+  var els = getCellsEls();
+  if(!playing){
+    for(var i=0;i<els.length;i++){
+      var h = els[i].querySelector('.hint');
+      if(h) h.remove();
+    }
+    return;
+  }
+  var nextMult = calcMult(opened + 1);
+  var hintText = '×' + nextMult.toFixed(2);
+  for(var i=0;i<els.length;i++){
+    var el = els[i];
+    if(el.classList.contains('opened')) continue;
+    var existing = el.querySelector('.hint');
+    if(existing){ existing.textContent = hintText; }
+    else { var span = document.createElement('span'); span.className = 'hint'; span.textContent = hintText; el.appendChild(span); }
+  }
+}
+
+function handleMinesSelect(e){
+  var btn = e.target.closest('.mine-btn');
+  if(!btn || playing) return;
+  var all = document.querySelectorAll('.mine-btn');
+  for(var i=0;i<all.length;i++) all[i].classList.remove('active');
+  btn.classList.add('active');
+  mineCount = parseInt(btn.dataset.mines);
+}
+
+// ==================== ИГРА ====================
+async function handleStart(){
+  if(playing) return;
+  var bet = parseInt($('bet').value) || 0;
+  if(bet < 10){ alert('Мин. ставка 10₽'); return; }
+  if(bet > 1000){ alert('Макс. ставка 1000₽'); return; }
+  if(bet > B){ alert('Мало денег'); return; }
+
+  // Списываем ставку через сервер
+  var newTotal = await safeChangeBalance(-bet, 'bet');
+  if(newTotal === null){ alert('❌ Ошибка списания ставки'); return; }
+  setBalDisplay(newTotal);
+
+  currentBet = bet;
+  currentMult = 1;
+  opened = 0;
+  playing = true;
+
+  mines = [];
+  var pool = [];
+  for(var i=0;i<CELLS;i++) pool.push(i);
+  for(var m=0;m<mineCount;m++){
+    var r = Math.floor(Math.random() * pool.length);
+    mines.push(pool.splice(r,1)[0]);
+  }
+
+  buildField();
+  $('startBtn').disabled = true;
+  $('cashoutBtn').disabled = true;
+  $('cashoutBtn').classList.add('on');
+
+  updateUI();
+  updateCellHints();
+}
+
+async function clickCell(idx){
+  if(!playing) return;
+  var els = getCellsEls();
+  var el = els[idx];
+  if(el.classList.contains('opened')) return;
+
+  // Попал на мину
+  if(mines.indexOf(idx) !== -1){
+    el.classList.add('opened','mine-revealed','mine-hit');
+    el.innerHTML = '💣';
+    sBoom();
+    playing = false;
+
+    for(var i=0;i<mines.length;i++){
+      var mi = mines[i];
+      if(mi !== idx){
+        els[mi].classList.add('opened','mine-revealed');
+        els[mi].innerHTML = '💣';
+      }
+    }
+
+    var hints = document.querySelectorAll('.hint');
+    for(var h=0;h<hints.length;h++) hints[h].remove();
+
+    $('startBtn').disabled = false;
+    $('cashoutBtn').classList.remove('on');
+    $('cashoutBtn').disabled = true;
+    $('status').innerHTML =
+      '💥 Мина! Потеряно <b style="color:#ff6b6b">₽' + fmt(currentBet) + '</b>' +
+      ' · могли забрать <b style="color:#1dd1a1">₽' + fmt(Math.floor(currentBet * currentMult)) + '</b>';
+    $('multVal').textContent = '×1.00';
+    $('multVal').className = 'val';
+
+    history.unshift({win:false});
+    if(history.length > 12) history.pop();
+    renderHistory();
+
+    currentBet = 0;
+    currentMult = 1;
+    opened = 0;
+    updateUI();
+    return;
+  }
+
+  // Алмаз
+  el.classList.add('opened','diamond');
+  el.innerHTML = '💎';
+  opened++;
+  sOpen();
+
+  currentMult = calcMult(opened);
+  updateUI();
+  updateCellHints();
+
+  // Открыли все безопасные клетки — авто-кэшаут
+  if(opened === CELLS - mineCount){ cashOut(); }
+}
+
+function updateUI(){
+  $('multVal').textContent = '×' + currentMult.toFixed(2);
+  $('multVal').className = currentMult > 1.001 ? 'val green' : 'val';
+
+  if(playing && opened > 0){
+    $('cashoutBtn').disabled = false;
+    $('cashoutBtn').textContent = '💰 ЗАБРАТЬ ₽' + fmt(Math.floor(currentBet * currentMult));
+
+    var nextMult = calcMult(opened + 1);
+    var nextWin = Math.floor(currentBet * nextMult);
+    var curWin = Math.floor(currentBet * currentMult);
+    $('status').innerHTML =
+      'Открыто: <b>' + opened + '</b> · ×' + currentMult.toFixed(2) +
+      '<br><span style="color:#1dd1a1">💎 Дальше: +₽' + fmt(nextWin - curWin) + ' (итого ₽' + fmt(nextWin) + ')</span>' +
+      ' · <span style="color:#ff6b6b">💣 Потеря: −₽' + fmt(currentBet) + '</span>';
+  } else if(playing){
+    $('cashoutBtn').disabled = true;
+    $('cashoutBtn').textContent = '💰 ЗАБРАТЬ';
+
+    var firstMult = calcMult(1);
+    var firstWin = Math.floor(currentBet * firstMult);
+    $('status').innerHTML =
+      'Жми клетку · <span style="color:#1dd1a1">💎 Первая: ₽' + fmt(firstWin) + '</span>' +
+      ' · <span style="color:#ff6b6b">💣 Потеря: −₽' + fmt(currentBet) + '</span>';
+  } else {
+    $('status').textContent = 'Выбери мины и жми НАЧАТЬ';
+  }
+}
+
+async function cashOut(){
+  if(!playing) return;
+  if(opened === 0) return;
+
+  var win = Math.floor(currentBet * currentMult);
+
+  // Начисляем выигрыш через сервер
+  var newTotal = await safeChangeBalance(win, 'win');
+  if(newTotal !== null) setBalDisplay(newTotal);
+
+  sWin();
+  flashGreen();
+  floatText('+₽' + fmt(win));
+
+  $('status').innerHTML =
+    '✅ Забрал <b style="color:#1dd1a1">₽' + fmt(win) + '</b> · ×' + currentMult.toFixed(2);
+  $('multVal').textContent = '+₽' + fmt(win);
+  $('multVal').className = 'val green';
+
+  playing = false;
+  $('startBtn').disabled = false;
+  $('cashoutBtn').classList.remove('on');
+  $('cashoutBtn').disabled = true;
+
+  var hints = document.querySelectorAll('.hint');
+  for(var h=0;h<hints.length;h++) hints[h].remove();
+
+  history.unshift({win:true});
+  if(history.length > 12) history.pop();
+  renderHistory();
+
+  setTimeout(function(){
+    $('multVal').textContent = '×1.00';
+    $('multVal').className = 'val';
+    currentBet = 0;
+    currentMult = 1;
+    opened = 0;
+    updateUI();
+  }, 1800);
+}
+
+function flashGreen(){
+  var f = document.createElement('div');
+  f.className = 'flash';
+  document.body.appendChild(f);
+  setTimeout(function(){ f.remove(); }, 900);
+}
+function floatText(text){
+  var el = document.createElement('div');
+  el.className = 'float-text';
+  el.textContent = text;
+  el.style.left = '50%'; el.style.top = '50%';
+  el.style.transform = 'translateX(-50%)';
+  document.body.appendChild(el);
+  setTimeout(function(){ el.remove(); }, 2000);
+}
+
+function renderHistory(){
+  var el = $('historyList');
+  el.innerHTML = '';
+  for(var i=0;i<history.length;i++){
+    var h = history[i];
+    var d = document.createElement('div');
+    d.className = 'hist-item ' + (h.win ? 'win' : 'lose');
+    d.textContent = h.win ? '💎' : '💣';
+    el.appendChild(d);
+  }
+}
+
+// ==================== СТАРТ ====================
+buildField();
+renderHistory();
+updateUI();
+loadBalance();
+
+$('minesSelect').onclick = handleMinesSelect;
+$('startBtn').onclick = handleStart;
+$('cashoutBtn').onclick = cashOut;
+</script>
+</body>
+</html>
