@@ -317,6 +317,7 @@ window.logout = function(){
   });
 };
 
+// ✅ ГЛАВНОЕ: синхронизация UID через Firebase Auth
 auth.onAuthStateChanged(function(user){
   if(user){
     localStorage.setItem(CURRENT_USER_KEY, user.uid);
